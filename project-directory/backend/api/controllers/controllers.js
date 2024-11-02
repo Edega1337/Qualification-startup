@@ -27,6 +27,7 @@ const registerUser = async (req, res) => {
 
 const authUser = async (req, res) => {
   try {
+    console.log(req.body);
     const { data } = await getUser(req.body);
     setRefreshTokenCookie(res, data.refreshToken);
     res.status(200).send({ accessToken: data.accessToken });

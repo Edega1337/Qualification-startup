@@ -36,7 +36,9 @@ const UpSideBar = () => {
       <Container fixed>
         <Toolbar>
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+            {/* Добавьте иконку сюда, если она нужна */}
           </IconButton>
+
           <Typography variant='h5' className={classes.title}>
             Тренировки.<span className={classes.highlight}>ТУТ</span>
           </Typography>
