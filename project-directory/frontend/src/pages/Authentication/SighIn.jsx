@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Box, InputAdornment } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import LockIcon from '@material-ui/icons/Lock';
 import { logInService } from '../../services/index';
+import { useStore } from '../../store/useStore';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -58,6 +60,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const { setAccessToken } = useStore((state) => ({
+    setAccessToken: state.setAccessToken,
+  }))
 
   const loginRef = useRef(null);
   const passwordRef = useRef(null);
@@ -78,8 +84,15 @@ export default function SignIn() {
         login: loginRef.current.value,
         password: passwordRef.current.value,
       }
-      const result = await logInService(dataObject);
-      console.log("Результат ответа от сервера", result);
+      try {
+        const result = await logInService(dataObject);
+        console.log("Результат ответа от сервера", result);
+        setAccessToken(result.accessToken);
+        navigate("/");
+      } catch (err) {
+        console.err;
+      }
+
     }
   };
 

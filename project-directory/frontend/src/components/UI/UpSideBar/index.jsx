@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 const UpSideBar = () => {
   const classes = useStyles();
+  const accessToken = localStorage.getItem("accessToken") || false;
   return (
     <AppBar position='fixed'>
       <Container fixed>
@@ -43,10 +44,19 @@ const UpSideBar = () => {
             Тренировки.<span className={classes.highlight}>ТУТ</span>
           </Typography>
           <Box>
-            <Typography variant="body1">
-              <Link to="/login" className={classes.link}>Войти</Link>
-              <Link to="/register" className={classes.link}>Зарегистрироваться</Link>
-            </Typography>
+            {accessToken ? (
+              // Отображение при наличии accessToken
+              <Typography variant="body1">
+                <Link to="/profile" className={classes.link}>Профиль</Link>
+                <Link to="/logout" className={classes.link}>Выйти</Link>
+              </Typography>
+            ) : (
+              // Отображение при отсутствии accessToken
+              <Typography variant="body1">
+                <Link to="/login" className={classes.link}>Войти</Link>
+                <Link to="/register" className={classes.link}>Зарегистрироваться</Link>
+              </Typography>
+            )}
           </Box>
         </Toolbar>
       </Container>
