@@ -44,7 +44,7 @@ $api.interceptors.response.use(
 
     if (error.response.data.status === 403.13) {
       logout();
-      window.location.href = "/signin";
+      window.location.href = "/login";
       return Promise.reject(error);
     }
 

@@ -76,23 +76,17 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (validateInputs()) {
-      console.log({
-        login: loginRef.current.value,
-        password: passwordRef.current.value,
-      });
       const dataObject = {
         login: loginRef.current.value,
         password: passwordRef.current.value,
       }
       try {
         const result = await logInService(dataObject);
-        console.log("Результат ответа от сервера", result);
         setAccessToken(result.accessToken);
         navigate("/");
       } catch (err) {
         console.err;
       }
-
     }
   };
 

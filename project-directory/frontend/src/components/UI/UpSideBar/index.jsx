@@ -1,4 +1,4 @@
-import { Container, Toolbar, AppBar, IconButton, Typography, Box } from '@material-ui/core';
+import { Container, Toolbar, AppBar, IconButton, Typography, Box, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'; // Или используйте `@mui/material/Link` для Material-UI
 
@@ -26,12 +26,23 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       color: 'red' // Цвет при наведении
     }
+  },
+  button: {
+    margin: theme.spacing(1),
+    color: theme.palette.common.white,
   }
 }));
 
 const UpSideBar = () => {
   const classes = useStyles();
   const accessToken = localStorage.getItem("accessToken") || false;
+
+  const handleLogout = () => {
+    // Ваша логика выхода (например, удаление токена и перенаправление)
+    localStorage.removeItem("accessToken");
+    window.location.href = '/content';
+  };
+
   return (
     <AppBar position='fixed'>
       <Container fixed>
@@ -47,8 +58,13 @@ const UpSideBar = () => {
             {accessToken ? (
               // Отображение при наличии accessToken
               <Typography variant="body1">
-                <Link to="/profile" className={classes.link}>Профиль</Link>
-                <Link to="/logout" className={classes.link}>Выйти</Link>
+                <Link to="/profile/" className={classes.link}>Здравствуйте, </Link>
+                <Button
+                  className={classes.button}
+                  onClick={handleLogout}
+                >
+                  Выйти
+                </Button>
               </Typography>
             ) : (
               // Отображение при отсутствии accessToken
