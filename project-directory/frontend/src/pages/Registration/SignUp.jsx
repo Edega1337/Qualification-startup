@@ -3,9 +3,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Box, InputAdornment } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
+import EmailIcon from '@material-ui/icons/Email';
 import LockIcon from '@material-ui/icons/Lock';
-import { logInService } from '../../services/index';
-import { useStore } from '../../store/useStore';
+import { signUpService } from '../../services/index';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.error.main,
     fontSize: '0.85rem',
     marginTop: theme.spacing(0.5),
-    textAlign: 'center',
   },
   submitButton: {
     width: '100%',
@@ -43,59 +42,43 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.primary.dark,
     },
   },
-  forgotPassword: {
-    marginTop: theme.spacing(1),
-    color: theme.palette.primary.main,
-    textAlign: 'center',
-    fontSize: '0.9rem',
-    '& a': {
-      color: theme.palette.primary.main,
-      textDecoration: 'none',
-      fontWeight: 'bold',
-      '&:hover': {
-        textDecoration: 'underline',
-      },
-    },
-  },
 }));
 
-export default function SignIn() {
+export default function SignUp() {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { setAccessToken } = useStore((state) => ({
-    setAccessToken: state.setAccessToken,
-  }))
 
   const loginRef = useRef(null);
+  const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
   const [loginError, setLoginError] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
-  const [generalError, setGeneralError] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setGeneralError(''); // Сброс общего сообщения об ошибке
     if (validateInputs()) {
       const dataObject = {
+        email: emailRef.current.value,
         login: loginRef.current.value,
         password: passwordRef.current.value,
-      }
+      };
       try {
-        const result = await logInService(dataObject);
-        setAccessToken(result.accessToken);
-        navigate("/");
+        await signUpService(dataObject);
+        navigate("/login");
       } catch (err) {
-        // Обработка ошибки, если логин или пароль неверны
-        setGeneralError('Неправильный логин или пароль. Пожалуйста, попробуйте еще раз.');
+        console.error(err);
       }
     }
   };
 
   const validateInputs = () => {
     const login = loginRef.current.value;
+    const email = emailRef.current.value;
     const password = passwordRef.current.value;
     let isValid = true;
 
@@ -106,6 +89,15 @@ export default function SignIn() {
     } else {
       setLoginError(false);
       setLoginErrorMessage('');
+    }
+
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      setEmailError(true);
+      setEmailErrorMessage('Please enter a valid email address.');
+      isValid = false;
+    } else {
+      setEmailError(false);
+      setEmailErrorMessage('');
     }
 
     if (!password || password.length < 6) {
@@ -123,14 +115,9 @@ export default function SignIn() {
   return (
     <div className={classes.container}>
       <Typography variant="h5" className={classes.heading}>
-        Вход
+        Регистрация
       </Typography>
       <form onSubmit={handleSubmit}>
-        {generalError && (
-          <Typography className={classes.errorMessage}>
-            {generalError}
-          </Typography>
-        )}
         <Box className={classes.formGroup}>
           <TextField
             type="text"
@@ -146,6 +133,27 @@ export default function SignIn() {
               startAdornment: (
                 <InputAdornment position="start">
                   <PersonIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
+        <Box className={classes.formGroup}>
+          <TextField
+            type="email"
+            id="email"
+            name="email"
+            label="Электронная почта"
+            variant="outlined"
+            inputRef={emailRef}
+            error={emailError}
+            helperText={emailError ? emailErrorMessage : ''}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon color="action" />
                 </InputAdornment>
               ),
             }}
@@ -174,12 +182,8 @@ export default function SignIn() {
         </Box>
 
         <Button type="submit" variant="contained" className={classes.submitButton}>
-          Войти
+          Зарегистрироваться
         </Button>
-
-        <Typography className={classes.forgotPassword}>
-          <a href="#">Забыли пароль?</a>
-        </Typography>
       </form>
     </div>
   );

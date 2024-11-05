@@ -1,4 +1,21 @@
 import $api from "../http";
+import { jwtDecode } from "jwt-decode";
+
+const getUserInfo = () => {
+  const accessToken = localStorage.getItem('accessToken');
+
+  if (accessToken) {
+    try {
+      const decodedToken = jwtDecode(accessToken);
+
+      if (decodedToken.login) {
+        return decodedToken.login;
+      }
+    } catch (error) {
+      console.error('Ошибка декодирования токена', error);
+    }
+  }
+}
 
 const signUpService = async (signUpData) => {
   const response = await $api.post(`/registration`, signUpData);
@@ -30,4 +47,4 @@ const currentUserService = async () => {
   return response.data;
 };
 
-export { logInService, signUpService, refreshTokenService, addCoinService, currentUserService };
+export { logInService, signUpService, refreshTokenService, addCoinService, currentUserService, getUserInfo };

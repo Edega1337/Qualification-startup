@@ -1,6 +1,7 @@
 import { Container, Toolbar, AppBar, IconButton, Typography, Box, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom'; // Или используйте `@mui/material/Link` для Material-UI
+import { getUserInfo } from '../../../services/index';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
 
 const UpSideBar = () => {
   const classes = useStyles();
-  const accessToken = localStorage.getItem("accessToken") || false;
+  const accessToken = localStorage.getItem('accessToken') || false;
 
   const handleLogout = () => {
-    // Ваша логика выхода (например, удаление токена и перенаправление)
+    // Логика выхода (например, удаление токена и перенаправление)
     localStorage.removeItem("accessToken");
     window.location.href = '/content';
   };
@@ -58,7 +59,7 @@ const UpSideBar = () => {
             {accessToken ? (
               // Отображение при наличии accessToken
               <Typography variant="body1">
-                <Link to="/profile/" className={classes.link}>Здравствуйте, </Link>
+                <Link to="/profile/" className={classes.link}>Здравствуйте, {getUserInfo()}</Link>
                 <Button
                   className={classes.button}
                   onClick={handleLogout}
@@ -70,7 +71,7 @@ const UpSideBar = () => {
               // Отображение при отсутствии accessToken
               <Typography variant="body1">
                 <Link to="/login" className={classes.link}>Войти</Link>
-                <Link to="/register" className={classes.link}>Зарегистрироваться</Link>
+                <Link to="/registration" className={classes.link}>Зарегистрироваться</Link>
               </Typography>
             )}
           </Box>
