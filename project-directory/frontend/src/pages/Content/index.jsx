@@ -2,34 +2,28 @@ import React from 'react';
 import {
   Container,
   Typography,
-  Paper,
   Grid,
   Card,
   CardMedia,
   CardContent,
   CardActions,
   Button,
+  Box,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import UpSideBar from '../../components/UI/UpSideBar';
-import SearchBar from '../../components/UI/SearchBar';
+import SearchBar from './SearchBar';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: theme.spacing(10),
-    display: 'flex', // Flexbox для расположения элементов
+    display: 'flex',
   },
   adsContainer: {
-    flex: 1, // Занимает оставшееся пространство
-    maxHeight: '80vh', // Максимальная высота
-    overflowY: 'auto', // Полоса прокрутки по вертикали
+    flex: 1,
+    maxHeight: '80vh',
+    overflowY: 'auto',
     padding: theme.spacing(2),
-  },
-  filterContainer: {
-    width: '300px', // Ширина блока с фильтром
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[3],
   },
   adCard: {
     marginTop: theme.spacing(4),
@@ -40,6 +34,33 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  stickySearchBar: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(2),
+    boxShadow: theme.shadows[3],
+    borderRadius: '4px',
+    marginBottom: theme.spacing(2),
+  },
+  recommendationsTitle: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(2),
+  },
+  recommendationsContainer: {
+    display: 'flex',
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(2),
+  },
+  recommendationCard: {
+    width: 200,
+    marginRight: theme.spacing(2),
+    flexShrink: 0,
   },
   price: {
     color: theme.palette.secondary.main,
@@ -60,7 +81,28 @@ const AdList = ({
       price: 5000,
       image: "https://example.com/your-image-url2.jpg",
     },
-    // ... другие объявления
+  ],
+  recommendations = [
+    {
+      title: "Беспроводные наушники beats solo 3",
+      price: "3100 ₽",
+      image: "https://example.com/your-image-url.jpg",
+    },
+    {
+      title: "Куртка alpha industries N-2B",
+      price: "7900 ₽",
+      image: "https://example.com/your-image-url2.jpg",
+    },
+    {
+      title: "Наушники beats studio 3 wireless",
+      price: "5000 ₽",
+      image: "https://example.com/your-image-url3.jpg",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image: "https://example.com/your-image-url4.jpg",
+    },
   ],
 }) => {
   const classes = useStyles();
@@ -69,17 +111,26 @@ const AdList = ({
     <Container className={classes.container}>
       <UpSideBar />
       <div className={classes.adsContainer}>
-        <Typography variant="h4" className={classes.title} gutterBottom>
-          Список Объявлений
+
+        {/* Sticky SearchBar */}
+        <Box className={classes.stickySearchBar}>
+          <SearchBar />
+        </Box>
+
+        {/* Recommendations Title */}
+        <Typography variant="h5" className={classes.recommendationsTitle}>
+          Рекомендации для вас
         </Typography>
-        <SearchBar />
+
+
+        {/* Ad List */}
         <Grid container spacing={4}>
           {ads.map((ad, index) => (
             <Grid item xs={12} key={index}>
               <Card className={classes.adCard} elevation={3}>
                 <CardMedia
                   className={classes.media}
-                  image={ad.image} // URL изображения
+                  image={ad.image}
                   title={ad.title}
                 />
                 <CardContent>
@@ -106,10 +157,6 @@ const AdList = ({
           ))}
         </Grid>
       </div>
-      <Paper className={classes.filterContainer}>
-        <Typography variant="h6">Настройки для поиска</Typography>
-        {/* Здесь можно добавить элементы управления для фильтров */}
-      </Paper>
     </Container>
   );
 };

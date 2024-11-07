@@ -3,7 +3,7 @@ import { useStore } from "../store/useStore";
 import { refreshTokenService } from "../services";
 
 const $api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "http://localhost:4000",
   withCredentials: true,
 });
 
@@ -44,7 +44,7 @@ $api.interceptors.response.use(
 
     if (error.response.data.status === 403.13) {
       logout();
-      window.location.href = "/signin";
+      window.location.href = "/login";
       return Promise.reject(error);
     }
 
