@@ -11,8 +11,14 @@ import UpSideBar from '../../components/UI/UpSideBar';
 
 const ProfilePage = () => {
   const [open, setOpen] = useState(false);
-  const [trainingType, setTrainingType] = useState("Фитнес"); // Начальное значение для Select
+  const [trainingType, setTrainingType] = useState("Фитнес");
   const [selectedDate, setSelectedDate] = useState(null);
+
+  // States for form fields
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [photo, setPhoto] = useState(null);
 
   const getProfile = async () => {
     try {
@@ -34,7 +40,18 @@ const ProfilePage = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  console.log(data);
+  const handleSubmit = () => {
+    const adData = {
+      title,
+      trainingType,
+      description,
+      price,
+      photo,
+      selectedDate,
+    };
+    console.log(adData); // здесь можно отправить данные на сервер
+    handleClose();
+  };
 
   return (
     <Box
@@ -48,7 +65,6 @@ const ProfilePage = () => {
       }}
     >
       <UpSideBar />
-      {/* Left Section - Profile Picture and Info */}
       <Box sx={{ width: '30%', textAlign: 'center', marginRight: 3 }}>
         <Box sx={{ position: 'relative', display: 'inline-block' }}>
           <Avatar
@@ -77,20 +93,8 @@ const ProfilePage = () => {
             Нет отзывов
           </Link>
         </Box>
-        <Box sx={{ marginTop: 2, textAlign: 'left' }}>
-          <Link href="#" sx={{ display: 'block', color: 'primary.main', fontSize: 16, marginBottom: 1 }}>
-            Заказы
-          </Link>
-          <Link href="#" sx={{ display: 'block', color: 'primary.main', fontSize: 16, marginBottom: 1 }}>
-            Мои отзывы
-          </Link>
-          <Link href="#" sx={{ display: 'block', color: 'primary.main', fontSize: 16 }}>
-            Избранное
-          </Link>
-        </Box>
       </Box>
 
-      {/* Right Section - Main Content */}
       <Box sx={{ width: '70%' }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
           Объявлений пока нет
@@ -108,7 +112,6 @@ const ProfilePage = () => {
         </Button>
       </Box>
 
-      {/* Modal for Trainer Ad Form */}
       <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -132,7 +135,14 @@ const ProfilePage = () => {
             </Typography>
             <Grid container spacing={1.5}>
               <Grid item xs={12}>
-                <TextField label="Название" fullWidth variant="outlined" required />
+                <TextField
+                  label="Название"
+                  fullWidth
+                  variant="outlined"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -141,8 +151,8 @@ const ProfilePage = () => {
                   variant="outlined"
                   select
                   required
-                  value={trainingType} // Устанавливаем значение
-                  onChange={(e) => setTrainingType(e.target.value)} // Обновляем значение при изменении
+                  value={trainingType}
+                  onChange={(e) => setTrainingType(e.target.value)}
                 >
                   <MenuItem value="Фитнес">Фитнес</MenuItem>
                   <MenuItem value="Йога">Йога</MenuItem>
@@ -151,16 +161,41 @@ const ProfilePage = () => {
                 </TextField>
               </Grid>
               <Grid item xs={12}>
-                <TextField label="Описание" fullWidth variant="outlined" multiline rows={3} required />
+                <TextField
+                  label="Описание"
+                  fullWidth
+                  variant="outlined"
+                  multiline
+                  rows={3}
+                  required
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
               </Grid>
               <Grid item xs={12}>
-                <Button variant="contained" component="label" fullWidth>
+                <Button
+                  variant="contained"
+                  component="label"
+                  fullWidth
+                >
                   Загрузить фото
-                  <input type="file" hidden />
+                  <input
+                    type="file"
+                    hidden
+                    onChange={(e) => setPhoto(e.target.files[0])}
+                  />
                 </Button>
               </Grid>
               <Grid item xs={12}>
-                <TextField label="Цена за занятие (руб.)" fullWidth variant="outlined" type="number" required />
+                <TextField
+                  label="Цена за занятие (руб.)"
+                  fullWidth
+                  variant="outlined"
+                  type="number"
+                  required
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
               </Grid>
               <Grid item xs={12}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -168,12 +203,22 @@ const ProfilePage = () => {
                     label="Возможные даты"
                     value={selectedDate}
                     onChange={(date) => setSelectedDate(date)}
+                    renderDay={(day, selectedDates, pickersDayProps) => {
+                      const { key, ...restProps } = pickersDayProps;
+                      return <PickersDay key={key} {...restProps} />;
+                    }}
                     renderInput={(params) => <TextField {...params} fullWidth variant="outlined" />}
                   />
                 </LocalizationProvider>
               </Grid>
               <Grid item xs={12}>
-                <Button variant="contained" color="primary" fullWidth size="large" onClick={handleClose}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  size="large"
+                  onClick={handleSubmit}
+                >
                   Отправить анкету
                 </Button>
               </Grid>
