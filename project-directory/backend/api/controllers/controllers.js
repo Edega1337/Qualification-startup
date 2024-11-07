@@ -1,5 +1,5 @@
 const { createUser, getUser } = require("../services/services");
-const { activate, logoutUser, refreshFunc, getUserInfo } = require("../services/user-service");
+const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
@@ -91,6 +91,7 @@ const loadAd = async (req, res) => {
   try {
     const ad = req.params;
     const resultLoadAd = await loadAdUser(ad);
+    console.log(resultLoadAd);
   } catch (error) {
     handleErrorResponse(res, error);
   }
@@ -99,7 +100,6 @@ const loadAd = async (req, res) => {
 module.exports = {
   registerUser,
   authUser,
-  addCoin,
   logout,
   activateUser,
   refresh,

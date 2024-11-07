@@ -9,7 +9,8 @@ const {
   refresh,
   activateUser,
   currentUser,
-  profileUsers
+  profileUsers,
+  loadAd
 } = require('../controllers/controllers');
 
 function router() {
@@ -72,7 +73,7 @@ function router() {
       url: 'user/:login',
       handler: profileUsers,
     },
-    loadAd: {
+    userLoadAd: {
       method: 'POST',
       url: 'user/ad',
       handler: loadAd,

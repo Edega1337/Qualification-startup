@@ -1,7 +1,7 @@
 const fastify = require("fastify")();
 const fastifyPostgres = require("@fastify/postgres");
 const { router } = require("./routes/routes.js");
-const cookiePlugin = require("fastify-cookie");
+const cookiePlugin = require("@fastify/cookie");
 const authMiddleware = require("./middleware/auth-middleware.js");
 require("dotenv").config();
 
@@ -42,7 +42,7 @@ fastify.register(
 fastify.register(
   (instance, opts, done) => {
     instance.addHook("preHandler", authMiddleware);
-    instance.route(router().takeCoin);
+    instance.route(router().userLoadAd);
     instance.route(router().logout);
     instance.route(router().userMe);
     instance.route(router().profile);
