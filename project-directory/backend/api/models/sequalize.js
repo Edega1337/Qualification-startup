@@ -37,13 +37,6 @@ const Users = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    coins: {
-      type: DataTypes.INTEGER,
-    },
-    level: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
   },
   {
     timestamps: true,
@@ -79,10 +72,54 @@ const TokenSchema = sequelize.define(
   }
 );
 
+//Модель хранения объявлений
+const adUsers = sequelize.define(
+  "adUsers",
+  {
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Users,
+        key: "id",
+      },
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    typeOfTrening: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    namePhoto: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    }
+  },
+  {
+    timestamps: true,
+  }
+);
+
+
 (async () => {
   try {
     await Users.sync({ force: false }); // Синхронизируем модель users, если в базе данных не создана модель, написать true, после выполнения сразу написать false
     await TokenSchema.sync({ force: false });
+    await adUsers.sync({ force: true });
     await sequelize.authenticate();
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {

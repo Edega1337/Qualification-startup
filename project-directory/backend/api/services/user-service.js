@@ -65,4 +65,17 @@ const getUserInfo = async (id) => {
   }
 }
 
-module.exports = { activate, logoutUser, refreshFunc, getUserInfo };
+const loadAdUser = async () => {
+  try {
+    // Вызов функции сохранения фотографии.
+
+    // Если Сохранение прошло успешно, тогда сохранём объявление в базу данных.
+
+    // Результат true и тогда выводим сообщение пользователю о том, что объявление на рассмотрении.
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+}
+
+module.exports = { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser };

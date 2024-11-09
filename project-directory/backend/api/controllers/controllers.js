@@ -1,4 +1,4 @@
-const { createUser, getUser, addCoinsToUserAccount } = require("../services/services");
+const { createUser, getUser } = require("../services/services");
 const { activate, logoutUser, refreshFunc, getUserInfo } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
 const path = require("path");
@@ -31,15 +31,6 @@ const authUser = async (req, res) => {
     const { data } = await getUser(req.body);
     setRefreshTokenCookie(res, data.refreshToken);
     res.status(200).send({ accessToken: data.accessToken });
-  } catch (error) {
-    handleErrorResponse(res, error);
-  }
-};
-
-const addCoin = async (req, res) => {
-  try {
-    const result = await addCoinsToUserAccount(req.body);
-    res.status(201).send(result);
   } catch (error) {
     handleErrorResponse(res, error);
   }
@@ -94,6 +85,15 @@ const profileUsers = async (req, res) => {
   } catch (error) {
     handleErrorResponse(res, error);
   }
+};
+
+const loadAd = async (req, res) => {
+  try {
+    const ad = req.params;
+    const resultLoadAd = await loadAdUser(ad);
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
 }
 
 module.exports = {
@@ -104,5 +104,6 @@ module.exports = {
   activateUser,
   refresh,
   currentUser,
-  profileUsers
+  profileUsers,
+  loadAd
 };
