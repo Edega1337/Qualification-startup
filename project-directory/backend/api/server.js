@@ -1,7 +1,7 @@
 const fastify = require("fastify")();
 const fastifyPostgres = require("@fastify/postgres");
 const { router } = require("./routes/routes.js");
-const cookiePlugin = require("fastify-cookie");
+const cookiePlugin = require("@fastify/cookie");
 const authMiddleware = require("./middleware/auth-middleware.js");
 require("dotenv").config();
 
