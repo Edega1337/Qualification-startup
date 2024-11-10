@@ -1,19 +1,23 @@
-import { Container, Toolbar, AppBar, IconButton, Typography, Box, Button } from '@material-ui/core';
+import React from 'react';
+import {
+  Container, Toolbar, AppBar, IconButton, Typography, Box, Button
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom'; // Или используйте `@mui/material/Link` для Material-UI
+import { Link } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';  // Example icon
 import { getUserInfo } from '../../../services/index';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   menuButton: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   title: {
     flexGrow: 1,
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   highlight: {
     color: theme.palette.secondary.main,
@@ -22,16 +26,19 @@ const useStyles = makeStyles((theme) => ({
   link: {
     margin: theme.spacing(1),
     color: theme.palette.common.white,
-    fontSize: '1.5rem', // Измените размер шрифта
+    fontSize: '1.5rem',
     textDecoration: 'none',
     '&:hover': {
-      color: 'red' // Цвет при наведении
-    }
+      color: 'red',
+    },
   },
   button: {
     margin: theme.spacing(1),
     color: theme.palette.common.white,
-  }
+    '&:hover': {
+      color: 'red',
+    },
+  },
 }));
 
 const UpSideBar = () => {
@@ -39,7 +46,6 @@ const UpSideBar = () => {
   const accessToken = localStorage.getItem('accessToken') || false;
 
   const handleLogout = () => {
-    // Логика выхода (например, удаление токена и перенаправление)
     localStorage.removeItem("accessToken");
     window.location.href = '/content';
   };
@@ -49,30 +55,37 @@ const UpSideBar = () => {
       <Container fixed>
         <Toolbar>
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            {/* Добавьте иконку сюда, если она нужна */}
+            {/* Optional main logo/icon here */}
           </IconButton>
 
           <Typography variant='h5' className={classes.title}>
             Тренировки.<span className={classes.highlight}>ТУТ</span>
           </Typography>
-          <Box>
+
+          <Box display="flex" alignItems="center">
+            <Link to="/" className={classes.link}>
+              <IconButton color="inherit">
+                <HomeIcon />
+              </IconButton>
+              Главная
+            </Link>
+
             {accessToken ? (
-              // Отображение при наличии accessToken
-              <Typography variant="body1">
-                <Link to="/profile/" className={classes.link}>Здравствуйте, {getUserInfo()}</Link>
-                <Button
-                  className={classes.button}
-                  onClick={handleLogout}
-                >
-                  Выйти
-                </Button>
-              </Typography>
+              <>
+                <Typography variant="h5">
+                  <Link to="/profile" className={classes.link}>
+                    Привет, {getUserInfo()}
+                  </Link>
+                  <Button className={classes.button} onClick={handleLogout}>
+                    Выйти
+                  </Button>
+                </Typography>
+              </>
             ) : (
-              // Отображение при отсутствии accessToken
-              <Typography variant="body1">
+              <>
                 <Link to="/login" className={classes.link}>Войти</Link>
                 <Link to="/registration" className={classes.link}>Зарегистрироваться</Link>
-              </Typography>
+              </>
             )}
           </Box>
         </Toolbar>
