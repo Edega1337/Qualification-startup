@@ -4,9 +4,10 @@ import {
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import { currentUserService } from '../../services';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker, PickersDay } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useQuery } from '@tanstack/react-query';
+import { sendAdService } from '../../services/index';
 import UpSideBar from '../../components/UI/UpSideBar';
 
 const ProfilePage = () => {
@@ -40,7 +41,7 @@ const ProfilePage = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const adData = {
       title,
       trainingType,
@@ -49,7 +50,10 @@ const ProfilePage = () => {
       photo,
       selectedDate,
     };
+
     console.log(adData); // здесь можно отправить данные на сервер
+    const result = await sendAdService(adData);
+    console.log("Результат отправления", result);
     handleClose();
   };
 

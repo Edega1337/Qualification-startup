@@ -2,6 +2,7 @@ const fastify = require("fastify")();
 const fastifyPostgres = require("@fastify/postgres");
 const { router } = require("./routes/routes.js");
 const cookiePlugin = require("@fastify/cookie");
+const multipart = require('fastify-multipart');
 const authMiddleware = require("./middleware/auth-middleware.js");
 require("dotenv").config();
 
@@ -17,6 +18,8 @@ fastify.register(require("@fastify/cors"), {
   allowedHeaders: ["content-type", "Authorization"],
   credentials: true,
 });
+
+fastify.register(multipart);
 
 const connectServer = async () => {
   fastify.register(fastifyPostgres, {
@@ -42,7 +45,7 @@ fastify.register(
 fastify.register(
   (instance, opts, done) => {
     instance.addHook("preHandler", authMiddleware);
-    instance.route(router().takeCoin);
+    instance.route(router().userLoadAd);
     instance.route(router().logout);
     instance.route(router().userMe);
     instance.route(router().profile);

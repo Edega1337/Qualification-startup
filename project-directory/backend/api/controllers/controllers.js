@@ -1,6 +1,7 @@
-const { createUser, getUser, addCoinsToUserAccount } = require("../services/services");
-const { activate, logoutUser, refreshFunc, getUserInfo } = require("../services/user-service");
+const { createUser, getUser } = require("../services/services");
+const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
+const AdService = require("../services/upload-service");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -27,19 +28,9 @@ const registerUser = async (req, res) => {
 
 const authUser = async (req, res) => {
   try {
-    console.log(req.body);
     const { data } = await getUser(req.body);
     setRefreshTokenCookie(res, data.refreshToken);
     res.status(200).send({ accessToken: data.accessToken });
-  } catch (error) {
-    handleErrorResponse(res, error);
-  }
-};
-
-const addCoin = async (req, res) => {
-  try {
-    const result = await addCoinsToUserAccount(req.body);
-    res.status(201).send(result);
   } catch (error) {
     handleErrorResponse(res, error);
   }
@@ -94,15 +85,36 @@ const profileUsers = async (req, res) => {
   } catch (error) {
     handleErrorResponse(res, error);
   }
-}
+};
+
+const loadAd = async (req, res) => {
+  try {
+    // Получаем данные из тела запроса
+    const accessToken = req.headers.authorization;
+    const adData = req.body;
+    console.log("результат получения данных", accessToken);
+    // Вызов сервиса для обработки данных объявления
+    const result = await AdService.saveAdData(adData, accessToken);
+    console.log("результат отправки", result);
+    // Если сохранение прошло успешно, отправляем ответ
+    if (result.success) {
+      res.send({ success: true, message: 'Объявление успешно загружено и находится на рассмотрении.' });
+    } else {
+      res.status(500).send({ success: false, message: 'Ошибка при сохранении объявления' });
+    }
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
 
 module.exports = {
   registerUser,
   authUser,
-  addCoin,
   logout,
   activateUser,
   refresh,
   currentUser,
-  profileUsers
+  profileUsers,
+  loadAd
 };
