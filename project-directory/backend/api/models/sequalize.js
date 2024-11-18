@@ -37,13 +37,6 @@ const Users = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    coins: {
-      type: DataTypes.INTEGER,
-    },
-    level: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-    },
   },
   {
     timestamps: true,
@@ -79,14 +72,68 @@ const TokenSchema = sequelize.define(
   }
 );
 
+//Модель хранения объявлений
+const adUsers = sequelize.define(
+  "adUsers",
+  {
+    ad_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    typeOfTrening: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    namePhoto: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    moderation: {
+      type: BOOLEAN,
+      defaultValue: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Users,
+        key: "id",
+      },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+
 (async () => {
   try {
     await Users.sync({ force: false }); // Синхронизируем модель users, если в базе данных не создана модель, написать true, после выполнения сразу написать false
     await TokenSchema.sync({ force: false });
+    await adUsers.sync({ force: true });
     await sequelize.authenticate();
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {
     console.log("Невозможно выполнить подключение к БД: ", e);
+    return 1;
   }
 })();
 
@@ -94,4 +141,5 @@ module.exports = {
   sequelize,
   Users,
   TokenSchema,
+  adUsers,
 };

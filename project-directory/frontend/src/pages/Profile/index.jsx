@@ -4,9 +4,10 @@ import {
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import { currentUserService } from '../../services';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker, PickersDay } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useQuery } from '@tanstack/react-query';
+import { sendAdService } from '../../services/index';
 import UpSideBar from '../../components/UI/UpSideBar';
 
 const ProfilePage = () => {
@@ -40,17 +41,33 @@ const ProfilePage = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = () => {
-    const adData = {
-      title,
-      trainingType,
-      description,
-      price,
-      photo,
-      selectedDate,
-    };
-    console.log(adData); // здесь можно отправить данные на сервер
-    handleClose();
+  const handleSubmit = async () => {
+    const formData = new FormData();
+
+    // Добавляем данные в formData
+    formData.append('title', title);
+    formData.append('trainingType', trainingType);
+    formData.append('description', description);
+    formData.append('price', price);
+
+    // Если фото загружено, добавляем его
+    if (photo) {
+      formData.append('photo', photo);
+    }
+
+    // Добавляем дату, если она выбрана
+    if (selectedDate) {
+      formData.append('selectedDate', selectedDate.toISOString()); // Преобразуем дату в ISO строку
+    }
+
+    try {
+      // Отправляем данные через сервис
+      const result = await sendAdService(formData);
+      console.log('Результат отправления', result);
+      handleClose(); // Закрываем модальное окно после отправки
+    } catch (error) {
+      console.error('Ошибка отправки формы:', error);
+    }
   };
 
   return (

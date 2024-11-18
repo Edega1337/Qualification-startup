@@ -85,25 +85,5 @@ const createUser = async (body) => {
   };
 };
 
-const addCoinsToUserAccount = async (body) => {
 
-  const { login, coin } = body;
-
-  const existingUser = await Users.findOne({ where: { login } });
-
-  if (!existingUser) {
-    throw new BadRequestError(`Пользователь со следующим логином ${login} не найден`, 400);
-  }
-
-  if (!existingUser.isActivated) {
-    throw new VerifyError('Почта не прошла верификацию, активируйте свой профиль перейдя по ссылке отправленной вам на почту');
-  }
-
-  existingUser.coins += coin;
-
-  await existingUser.save();
-
-  return existingUser.coins;
-}
-
-module.exports = { getUser, createUser, addCoinsToUserAccount };
+module.exports = { getUser, createUser };

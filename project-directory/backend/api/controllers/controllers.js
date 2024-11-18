@@ -1,7 +1,9 @@
-const { createUser, getUser, addCoinsToUserAccount } = require("../services/services");
-const { activate, logoutUser, refreshFunc, getUserInfo } = require("../services/user-service");
+const { createUser, getUser } = require("../services/services");
+const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
+const fs = require('fs');
 const path = require("path");
+const { v4: uuidv4 } = require('uuid');
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const handleErrorResponse = (res, error, defaultStatus = "No name error") => {
@@ -27,19 +29,9 @@ const registerUser = async (req, res) => {
 
 const authUser = async (req, res) => {
   try {
-    console.log(req.body);
     const { data } = await getUser(req.body);
     setRefreshTokenCookie(res, data.refreshToken);
     res.status(200).send({ accessToken: data.accessToken });
-  } catch (error) {
-    handleErrorResponse(res, error);
-  }
-};
-
-const addCoin = async (req, res) => {
-  try {
-    const result = await addCoinsToUserAccount(req.body);
-    res.status(201).send(result);
   } catch (error) {
     handleErrorResponse(res, error);
   }
@@ -94,15 +86,122 @@ const profileUsers = async (req, res) => {
   } catch (error) {
     handleErrorResponse(res, error);
   }
-}
+};
+
+// const loadAd = async (req, res) => {
+//   try {
+//     const parts = [];
+//     for await (const part of request.parts()) {
+//       if (part.file) {
+//         console.log(`File: ${part.filename}`);
+//         parts.push({ fileName: part.filename, size: part.file.size });
+//       } else {
+//         console.log(`${part.fieldname}: ${part.value}`);
+//         parts.push({ fieldname: part.fieldname, value: part.value });
+//       }
+//     }
+
+//     // for await (const part of parts) {
+//     //   if (part.file) {
+//     //     // Если это файл, работаем с ним отдельно
+//     //     console.log(`Получен файл: ${part.filename}`);
+//     //     // Пример: сохранить файл
+//     //     await part.toFile(`./uploads/${part.filename}`);
+//     //   } else {
+//     //     // Если это обычное поле
+//     //     formData[part.fieldname] = part.value;
+//     //   }
+//     // }
+//     // const accessToken = req.headers.authorization;
+//     // const adData = req.body;
+//     // console.log("adData:", adData);
+//     // const result = await AdService.saveAdData(adData, accessToken);
+//     // console.log("результат отправки", result);
+//     // Если сохранение прошло успешно, отправляем ответ
+
+//   } catch (error) {
+//     handleErrorResponse(res, error);
+//   }
+// };
+
+const loadAd = async (req, res) => {
+  try {
+    const parts = [];
+    const adData = {}; // Объект для хранения полей формы
+    let uploadedFileData = null; // Информация о сохранённом файле
+
+    for await (const part of req.parts()) {
+      if (part.file) {
+        // Генерируем уникальный ID
+        const uniqueId = uuidv4();
+
+        // Получаем расширение файла
+        const ext = path.extname(part.filename);
+
+        // Формируем уникальное имя файла
+        const uniqueFileName = `${uniqueId}${ext}`;
+        const uploadDir = path.join(__dirname, '../uploads');
+
+        // Создаём директорию, если её нет
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir);
+        }
+
+        const filePath = path.join(uploadDir, uniqueFileName);
+        const writeStream = fs.createWriteStream(filePath);
+
+        await part.file.pipe(writeStream); // Сохраняем файл
+        uploadedFileData = { fileName: uniqueFileName, path: filePath };
+
+        console.log(`File saved as: ${filePath}`);
+        parts.push({ fieldname: part.fieldname, fileName: uniqueFileName });
+      } else {
+        // Если это текстовое поле
+        console.log(`${part.fieldname}: ${part.value}`);
+        adData[part.fieldname] = part.value; // Сохраняем текстовые данные
+        parts.push({ fieldname: part.fieldname, value: part.value });
+      }
+    }
+
+    // Выводим данные для отладки
+    console.log('Parsed ad data:', adData);
+
+    // Пример использования данных
+    const { title, trainingType, description, price, selectedDate } = adData;
+
+    console.log(`Title: ${title}`);
+    console.log(`Training Type: ${trainingType}`);
+    console.log(`Description: ${description}`);
+    console.log(`Price: ${price}`);
+    console.log(`Selected Date: ${selectedDate}`);
+    console.log(`Uploaded File Info:`, uploadedFileData);
+
+    // Отправляем ответ
+    res.status(200).send({
+      message: 'Ad successfully received',
+      data: {
+        title,
+        trainingType,
+        description,
+        price,
+        selectedDate,
+        uploadedFile: uploadedFileData,
+      },
+    });
+  } catch (error) {
+    console.error('Error processing form:', error);
+    res.status(500).send({ message: 'Error processing form', error });
+  }
+};
+
 
 module.exports = {
   registerUser,
   authUser,
-  addCoin,
   logout,
   activateUser,
   refresh,
   currentUser,
-  profileUsers
+  profileUsers,
+  loadAd
 };

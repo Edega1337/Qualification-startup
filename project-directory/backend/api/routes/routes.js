@@ -1,3 +1,4 @@
+const multer = require('fastify-multer');
 const {
   validationAuthorization,
   validationRegistration
@@ -5,14 +6,13 @@ const {
 const {
   registerUser,
   authUser,
-  addCoin,
   logout,
   refresh,
   activateUser,
   currentUser,
-  profileUsers
+  profileUsers,
+  loadAd
 } = require('../controllers/controllers');
-const { middleware } = require('../middleware/auth-middleware');
 
 function router() {
   return {
@@ -49,21 +49,6 @@ function router() {
         preHandler: validationAuthorization
       }
     },
-    takeCoin: {
-      method: 'POST',
-      url: 'user/coins/add',
-      handler: addCoin,
-      schema: {
-        body: {
-          type: 'object',
-          required: ['login', 'coin'],
-          properties: {
-            login: { type: 'string' },
-            coin: { type: 'number' }
-          }
-        },
-      }
-    },
     logout: {
       method: 'POST',
       url: 'logout',
@@ -88,6 +73,11 @@ function router() {
       method: 'GET',
       url: 'user/:login',
       handler: profileUsers,
+    },
+    userLoadAd: {
+      method: 'POST',
+      url: 'user/ad',
+      handler: loadAd,
     }
   };
 }

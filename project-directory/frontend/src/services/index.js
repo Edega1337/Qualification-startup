@@ -1,6 +1,7 @@
 import $api from "../http";
 import { jwtDecode } from "jwt-decode";
 
+
 const getUserInfo = () => {
   const accessToken = localStorage.getItem('accessToken');
 
@@ -29,16 +30,17 @@ const logInService = async (loginData) => {
   return response.data;
 };
 
+const sendAdService = async (formData) => {
+  console.log(formData);
+  const response = await $api.post('user/ad', formData);
+
+  return response.data;
+};
+
 const refreshTokenService = async () => {
   const response = await $api.get(`/auth/refresh`);
 
   return response.data.accessToken;
-};
-
-const addCoinService = async (login, coin) => {
-  const response = await $api.post(`/user/coins/add`, { login, coin });
-
-  return response.data;
 };
 
 const currentUserService = async () => {
@@ -47,4 +49,4 @@ const currentUserService = async () => {
   return response.data;
 };
 
-export { logInService, signUpService, refreshTokenService, addCoinService, currentUserService, getUserInfo };
+export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService };
