@@ -1,6 +1,7 @@
 import $api from "../http";
 import { jwtDecode } from "jwt-decode";
 
+
 const getUserInfo = () => {
   const accessToken = localStorage.getItem('accessToken');
 
@@ -29,11 +30,12 @@ const logInService = async (loginData) => {
   return response.data;
 };
 
-const sendAdService = async (adData) => {
-  const response = await $api.post(`/user/ad`, adData);
+const sendAdService = async (formData) => {
+  console.log(formData);
+  const response = await $api.post('user/ad', formData);
 
   return response.data;
-}
+};
 
 const refreshTokenService = async () => {
   const response = await $api.get(`/auth/refresh`);

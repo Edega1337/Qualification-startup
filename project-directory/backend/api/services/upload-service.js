@@ -1,6 +1,5 @@
-const { adUsers } = require("../models/sequalize");
-const { jwtDecode } = require("jwt-decode");
-
+const { jwtDecode } = require('jwt-decode');
+const { adUsers } = require('../models/sequalize');
 
 class AdService {
   async saveAdData(adData, accessToken) {
@@ -24,7 +23,9 @@ class AdService {
       console.error('Ошибка при сохранении данных объявления:', error);
       return { success: false, error };
     }
-  }
+  };
+  async
 }
 
 module.exports = new AdService();
+

@@ -1,3 +1,4 @@
+const multer = require('fastify-multer');
 const {
   validationAuthorization,
   validationRegistration

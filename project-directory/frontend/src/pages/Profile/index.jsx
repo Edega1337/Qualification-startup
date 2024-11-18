@@ -42,19 +42,32 @@ const ProfilePage = () => {
   const handleClose = () => setOpen(false);
 
   const handleSubmit = async () => {
-    const adData = {
-      title,
-      trainingType,
-      description,
-      price,
-      photo,
-      selectedDate,
-    };
+    const formData = new FormData();
 
-    console.log(adData); // здесь можно отправить данные на сервер
-    const result = await sendAdService(adData);
-    console.log("Результат отправления", result);
-    handleClose();
+    // Добавляем данные в formData
+    formData.append('title', title);
+    formData.append('trainingType', trainingType);
+    formData.append('description', description);
+    formData.append('price', price);
+
+    // Если фото загружено, добавляем его
+    if (photo) {
+      formData.append('photo', photo);
+    }
+
+    // Добавляем дату, если она выбрана
+    if (selectedDate) {
+      formData.append('selectedDate', selectedDate.toISOString()); // Преобразуем дату в ISO строку
+    }
+
+    try {
+      // Отправляем данные через сервис
+      const result = await sendAdService(formData);
+      console.log('Результат отправления', result);
+      handleClose(); // Закрываем модальное окно после отправки
+    } catch (error) {
+      console.error('Ошибка отправки формы:', error);
+    }
   };
 
   return (
