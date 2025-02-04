@@ -2,7 +2,7 @@ const { jwtDecode } = require('jwt-decode');
 const { adUsers } = require('../models/sequalize');
 
 class AdService {
-  async saveAdData(adData, accessToken) {
+  async saveAdData(adData, namePhoto, accessToken) {
     try {
       const { title, trainingType, description, price, selectedDate } = adData;
       const { id } = jwtDecode(accessToken);
@@ -11,7 +11,7 @@ class AdService {
         name: title,
         typeOfTrening: trainingType,
         description: description,
-        namePhoto: "//",
+        namePhoto: namePhoto,
         price: price,
         date: selectedDate,
         moderation: false,
@@ -24,7 +24,7 @@ class AdService {
       return { success: false, error };
     }
   };
-  async
+  
 }
 
 module.exports = new AdService();

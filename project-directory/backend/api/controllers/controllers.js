@@ -1,10 +1,12 @@
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const { createUser, getUser } = require("../services/services");
 const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
-const fs = require('fs');
-const path = require("path");
-const { v4: uuidv4 } = require('uuid');
-require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+const AdService = require("../services/upload-service");
+
 
 const handleErrorResponse = (res, error, defaultStatus = "No name error") => {
   res.status(error.status || defaultStatus).send(error);
@@ -88,47 +90,12 @@ const profileUsers = async (req, res) => {
   }
 };
 
-// const loadAd = async (req, res) => {
-//   try {
-//     const parts = [];
-//     for await (const part of request.parts()) {
-//       if (part.file) {
-//         console.log(`File: ${part.filename}`);
-//         parts.push({ fileName: part.filename, size: part.file.size });
-//       } else {
-//         console.log(`${part.fieldname}: ${part.value}`);
-//         parts.push({ fieldname: part.fieldname, value: part.value });
-//       }
-//     }
-
-//     // for await (const part of parts) {
-//     //   if (part.file) {
-//     //     // Если это файл, работаем с ним отдельно
-//     //     console.log(`Получен файл: ${part.filename}`);
-//     //     // Пример: сохранить файл
-//     //     await part.toFile(`./uploads/${part.filename}`);
-//     //   } else {
-//     //     // Если это обычное поле
-//     //     formData[part.fieldname] = part.value;
-//     //   }
-//     // }
-//     // const accessToken = req.headers.authorization;
-//     // const adData = req.body;
-//     // console.log("adData:", adData);
-//     // const result = await AdService.saveAdData(adData, accessToken);
-//     // console.log("результат отправки", result);
-//     // Если сохранение прошло успешно, отправляем ответ
-
-//   } catch (error) {
-//     handleErrorResponse(res, error);
-//   }
-// };
-
 const loadAd = async (req, res) => {
   try {
     const parts = [];
     const adData = {}; // Объект для хранения полей формы
     let uploadedFileData = null; // Информация о сохранённом файле
+    const accessToken = req.headers.authorization;
 
     for await (const part of req.parts()) {
       if (part.file) {
@@ -163,36 +130,36 @@ const loadAd = async (req, res) => {
       }
     }
 
+    const resultLoadAd = await AdService.saveAdData(adData, uploadedFileData.fileName, accessToken);
+
+
+
     // Выводим данные для отладки
-    console.log('Parsed ad data:', adData);
+    console.log('Результат сохранения объявления:', resultLoadAd);
 
     // Пример использования данных
-    const { title, trainingType, description, price, selectedDate } = adData;
+    // const { title, trainingType, description, price, selectedDate } = adData;
 
-    console.log(`Title: ${title}`);
-    console.log(`Training Type: ${trainingType}`);
-    console.log(`Description: ${description}`);
-    console.log(`Price: ${price}`);
-    console.log(`Selected Date: ${selectedDate}`);
-    console.log(`Uploaded File Info:`, uploadedFileData);
+
+
+    // console.log(`Title: ${title}`);
+    // console.log(`Training Type: ${trainingType}`);
+    // console.log(`Description: ${description}`);
+    // console.log(`Price: ${price}`);
+    // console.log(`Selected Date: ${selectedDate}`);
+    // console.log(`Uploaded File Info:`, uploadedFileData);
 
     // Отправляем ответ
     res.status(200).send({
       message: 'Ad successfully received',
-      data: {
-        title,
-        trainingType,
-        description,
-        price,
-        selectedDate,
-        uploadedFile: uploadedFileData,
-      },
     });
   } catch (error) {
     console.error('Error processing form:', error);
     res.status(500).send({ message: 'Error processing form', error });
   }
 };
+
+
 
 
 module.exports = {

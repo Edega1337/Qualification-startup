@@ -1,163 +1,163 @@
-import React from 'react';
-import {
-  Container,
-  Typography,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  Button,
-  Box,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import UpSideBar from '../../components/UI/UpSideBar';
-import SearchBar from './SearchBar';
+import React from "react";
+import UpSideBar from "../../components/UI/UpSideBar";
+import SearchBar from "../../components/UI/SearchBar";
+import "./style.scss";
+import { useState } from "react";
 
-const useStyles = makeStyles((theme) => ({
-  container: {
-    marginTop: theme.spacing(10),
-    display: 'flex',
-  },
-  adsContainer: {
-    flex: 1,
-    maxHeight: '80vh',
-    overflowY: 'auto',
-    padding: theme.spacing(2),
-  },
-  adCard: {
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(4),
-  },
-  media: {
-    height: 140,
-  },
-  title: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  stickySearchBar: {
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(2),
-    boxShadow: theme.shadows[3],
-    borderRadius: '4px',
-    marginBottom: theme.spacing(2),
-  },
-  recommendationsTitle: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: theme.spacing(4),
-    marginBottom: theme.spacing(2),
-  },
-  recommendationsContainer: {
-    display: 'flex',
-    overflowX: 'auto',
-    paddingBottom: theme.spacing(2),
-  },
-  recommendationCard: {
-    width: 200,
-    marginRight: theme.spacing(2),
-    flexShrink: 0,
-  },
-  price: {
-    color: theme.palette.secondary.main,
-  },
-}));
-
-const AdList = ({
-  ads = [
+const AdList = ({ recommendations = [] }) => {
+  recommendations = [
+    {
+      title: "Беспроводные наушники beats solo 3",
+      price: "3100 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiRD9O_76qAzjpaKsZVMx9f_d2dBbmDixlwQ&s",
+      type_of_trening: "Фитнес",
+    },
+    {
+      title: "Куртка alpha industries N-2B",
+      price: "7900 ₽",
+      image:
+        "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQNEcdFp9NTwoHR2gnSgiFSdfobF8_T9K7ScvQmAzmisFpYJxh3q-ZKg3HKPJzJ62ZFlVQwvhJZhcTAjQLOnJdKykr8tjx1jlgQATasXqYXzyTonfbhXNh8EZsRo4ybt72D5Ub8pbUq&usqp=CAc",
+      type_of_trening: "Фитнес",
+    },
+    {
+      title: "Наушники beats studio 3 wireless",
+      price: "5000 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUyJnvDqbWeQfmvh8a_7w2ybgDevnYGY_duA&s",
+      type_of_trening: "Фитнес",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Йога",
+    },
     {
       title: "Продается велосипед",
       description: "В отличном состоянии, практически новый.",
       price: 15000,
-      image: "https://example.com/your-image-url.jpg",
+      image:
+        "https://velomisto.com.ua/content/uploads/images/kinetic-profi.jpeg",
+      type_of_trening: "Йога",
     },
     {
       title: "Классные наушники",
       description: "Наушники с шумоподавлением, практически не использовались.",
       price: 5000,
-      image: "https://example.com/your-image-url2.jpg",
-    },
-  ],
-  recommendations = [
-    {
-      title: "Беспроводные наушники beats solo 3",
-      price: "3100 ₽",
-      image: "https://example.com/your-image-url.jpg",
-    },
-    {
-      title: "Куртка alpha industries N-2B",
-      price: "7900 ₽",
-      image: "https://example.com/your-image-url2.jpg",
-    },
-    {
-      title: "Наушники beats studio 3 wireless",
-      price: "5000 ₽",
-      image: "https://example.com/your-image-url3.jpg",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5ooehvxFRGUQDn8sIaI6g31MzXaDUEO1r3A&s",
+      type_of_trening: "Йога",
     },
     {
       title: "Парка Alpha industries",
       price: "7990 ₽",
-      image: "https://example.com/your-image-url4.jpg",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Йога",
     },
-  ],
-}) => {
-  const classes = useStyles();
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Йога",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Йога",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Боевые искусства",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Боевые искусства",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Боевые искусства",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Боевые искусства",
+    },
+    {
+      title: "Парка Alpha industries",
+      price: "7990 ₽",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCV3lzLntmaJjY3-dHbnRT2QbtkT7uSloWkw&s",
+      type_of_trening: "Боевые искусства",
+    },
+  ];
+
+  const [filteredAds, setFilteredAds] = useState(recommendations);
+
+  const handleSearch = (searchTerm) => {
+    if (!searchTerm) {
+      setFilteredAds(recommendations);
+      return;
+    }
+    const lowerCasedTerm = searchTerm.toLowerCase();
+    setFilteredAds(
+      recommendations.filter(
+        (ad) =>
+          ad.title.toLowerCase().includes(lowerCasedTerm) ||
+          ad.type_of_trening.toLowerCase().includes(lowerCasedTerm)
+      )
+    );
+  };
 
   return (
-    <Container className={classes.container}>
+    <div className="container">
       <UpSideBar />
-      <div className={classes.adsContainer}>
-
-        {/* Sticky SearchBar */}
-        <Box className={classes.stickySearchBar}>
-          <SearchBar />
-        </Box>
-
-        {/* Recommendations Title */}
-        <Typography variant="h5" className={classes.recommendationsTitle}>
-          Рекомендации для вас
-        </Typography>
-
-
-        {/* Ad List */}
-        <Grid container spacing={4}>
-          {ads.map((ad, index) => (
-            <Grid item xs={12} key={index}>
-              <Card className={classes.adCard} elevation={3}>
-                <CardMedia
-                  className={classes.media}
-                  image={ad.image}
-                  title={ad.title}
-                />
-                <CardContent>
-                  <Typography variant="h6" className={classes.title}>
-                    {ad.title}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {ad.description}
-                  </Typography>
-                  <Typography variant="h6" className={classes.price}>
-                    {ad.price} Р
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" color="primary">
-                    Подробнее
-                  </Button>
-                  <Button size="small" color="secondary">
-                    Связаться
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+      <div className="stickySearchBar">
+        <SearchBar onSearch={handleSearch} />
       </div>
-    </Container>
+      <div className="adsContainer">
+        <h5 className="recommendationsTitle">Список объявлений</h5>
+        <div className="adList">
+          {filteredAds.map((ad, index) => (
+            <div key={index} className="adCard">
+              <div className="adCardItems">
+                <div>
+                  <img src={ad.image} alt={ad.title} className="media" />
+                </div>
+                <div>
+                  <div className="title">{ad.title}</div>
+                  <div className="price">{ad.price}</div>
+                  <div className="description">
+                    {ad.description ||
+                      "Лучшее качество. Качество лучшее что есть на рынке..."}
+                  </div>
+                  <div className="details">
+                    <span>Аудио и видео</span>
+                    <span className="delivery">Доставка от 1 дня</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

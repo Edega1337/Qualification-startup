@@ -1,0 +1,68 @@
+// UpSideBar.scss
+
+$primary-color: #3f51b5; // Цвет основного интерфейса
+$secondary-color: #f50057; // Цвет выделения
+$text-color: white; // Цвет текста
+
+.upSideBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #3f51b5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Добавляем тень для читаемости
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    padding: 0 20px;
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: center; // Центрирование заголовка
+
+      .highlight {
+        color: $secondary-color;
+        font-weight: bold;
+      }
+    }
+
+    .title h1 {
+      margin: 0;
+      color: white;
+    }
+
+    .link {
+      margin: 0 10px; // Увеличиваем отступы для равномерности
+      color: $text-color;
+      font-size: 1.2rem; // Уменьшать шрифт для лучшего восприятия
+      text-decoration: none;
+
+      &:hover {
+        color: red;
+      }
+    }
+
+    .button {
+      margin: 0 10px; // Отступы
+      color: $text-color;
+      background: none; // Убираем фон
+      border: none; // Убираем границу
+      font-size: 1.2rem; // Увеличиваем размер текста
+
+      &:hover {
+        color: red;
+        cursor: pointer; // Курсор как указатель
+      }
+    }
+
+    .icon {
+      color: $text-color; // Цвет иконок
+      margin-right: 5px; // Отступ между иконкой и текстом
+    }
+  }
+}

@@ -128,7 +128,7 @@ const adUsers = sequelize.define(
   try {
     await Users.sync({ force: false }); // Синхронизируем модель users, если в базе данных не создана модель, написать true, после выполнения сразу написать false
     await TokenSchema.sync({ force: false });
-    await adUsers.sync({ force: true });
+    await adUsers.sync({ force: false });
     await sequelize.authenticate();
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {
