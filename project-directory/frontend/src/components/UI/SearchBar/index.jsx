@@ -15,13 +15,10 @@ const SearchBar = ({ onSearch }) => {
       <input
         className="input"
         type="text"
-        placeholder="Поиск по объявлениям"
+        placeholder="Поиск тренировок"
         value={searchTerm}
         onChange={handleInputChange}
       />
-      <button className="button" onClick={() => onSearch(searchTerm)}>
-        Найти
-      </button>
     </div>
   );
 };

@@ -1,44 +1,26 @@
 $primary-color: #3f51b5;
 $text-color: white;
+$background-color: #f9f9f9;
+$border-radius: 8px;
 @use "sass:color";
 
 // Стили для SearchBar
 .searchBar {
   display: flex;
-  align-items: center;
-  margin: 16px 0;
-  padding: 8px;
-  // background: #fff;
-  // border-radius: 8px;
-  // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  max-width: 400px;
+  margin: 16px auto;
 
   .input {
     flex-grow: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-    }
-  }
-
-  .button {
-    margin-left: 8px;
-    padding: 10px 15px;
-    background-color: $primary-color;
-    color: $text-color;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    outline: none;
     font-size: 1rem;
-    transition: background-color 0.2s ease-in-out;
-
-    &:hover {
-      background-color: color.scale($primary-color, $lightness: -10%);
-    }
+    padding: 8px;
+    background: transparent;
   }
 }
 
@@ -51,16 +33,16 @@ $text-color: white;
 
   .adList {
     display: flex;
-    flex-direction: column; // Главная ось вертикально
-    gap: 20px; // Отступ между карточками
+    flex-direction: column;
+    gap: 20px;
 
     .adCard {
-      width: 100%; // Занимает всю ширину контейнера
+      width: 100%;
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       padding: 16px;
-      box-sizing: border-box; // Чтобы padding не влиял на ширину
+      box-sizing: border-box;
 
       .media {
         width: 100%;

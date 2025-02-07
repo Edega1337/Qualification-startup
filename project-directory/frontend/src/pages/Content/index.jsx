@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import UpSideBar from "../../components/UI/UpSideBar";
 import SearchBar from "../../components/UI/SearchBar";
+import { useDebounce } from "../../components/HOC/useDebounce";
 import "./style.scss";
-import { useState } from "react";
 
 const AdList = ({ recommendations = [] }) => {
   recommendations = [
@@ -109,13 +109,17 @@ const AdList = ({ recommendations = [] }) => {
   ];
 
   const [filteredAds, setFilteredAds] = useState(recommendations);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearch = (searchTerm) => {
-    if (!searchTerm) {
+  const debouncedSearchTerm = useDebounce(searchTerm, 500); // Задержка в 500 мс
+
+  useEffect(() => {
+    if (!debouncedSearchTerm) {
       setFilteredAds(recommendations);
       return;
     }
-    const lowerCasedTerm = searchTerm.toLowerCase();
+
+    const lowerCasedTerm = debouncedSearchTerm.toLowerCase();
     setFilteredAds(
       recommendations.filter(
         (ad) =>
@@ -123,13 +127,13 @@ const AdList = ({ recommendations = [] }) => {
           ad.type_of_trening.toLowerCase().includes(lowerCasedTerm)
       )
     );
-  };
+  }, [debouncedSearchTerm, recommendations]);
 
   return (
     <div className="container">
       <UpSideBar />
       <div className="stickySearchBar">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearch={setSearchTerm} /> {/* Теперь просто обновляем состояние */}
       </div>
       <div className="adsContainer">
         <h5 className="recommendationsTitle">Список объявлений</h5>
@@ -144,8 +148,7 @@ const AdList = ({ recommendations = [] }) => {
                   <div className="title">{ad.title}</div>
                   <div className="price">{ad.price}</div>
                   <div className="description">
-                    {ad.description ||
-                      "Лучшее качество. Качество лучшее что есть на рынке..."}
+                    {ad.description || "Лучшее качество. Качество лучшее что есть на рынке..."}
                   </div>
                   <div className="details">
                     <span>Аудио и видео</span>

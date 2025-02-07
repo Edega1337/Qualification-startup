@@ -24,7 +24,7 @@ class AdService {
       return { success: false, error };
     }
   };
-  
+
 }
 
 module.exports = new AdService();

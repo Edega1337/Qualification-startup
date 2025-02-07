@@ -123,6 +123,10 @@ const adUsers = sequelize.define(
   }
 );
 
+// Определяем ассоциации с алиасами
+Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads' }); // Указываем алиас 'ads'
+adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' }); // Алиас для обратной связи (опционально)
+
 
 (async () => {
   try {

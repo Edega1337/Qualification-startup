@@ -1,9 +1,11 @@
 const fastify = require("fastify")();
 const fastifyPostgres = require("@fastify/postgres");
-const { router } = require("./routes/routes.js");
-const cookiePlugin = require("@fastify/cookie");
-const authMiddleware = require("./middleware/auth-middleware.js");
 const multipart = require('@fastify/multipart');
+const cookiePlugin = require("@fastify/cookie");
+const path = require("path");
+const fastifyStatic = require("@fastify/static");
+const authMiddleware = require("./middleware/auth-middleware.js");
+const { router } = require("./routes/routes.js");
 
 require("dotenv").config();
 
@@ -21,6 +23,11 @@ fastify.register(require("@fastify/cors"), {
   allowedHeaders: ["content-type", "Authorization"],
   credentials: true,
 });
+
+fastify.register(fastifyStatic, {
+  root: path.join(__dirname, './uploads'), // Хранилище фото пользователей
+  prefix: "/uploads/",
+})
 
 const connectServer = async () => {
   try {

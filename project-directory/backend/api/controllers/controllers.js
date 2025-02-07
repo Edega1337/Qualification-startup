@@ -159,9 +159,6 @@ const loadAd = async (req, res) => {
   }
 };
 
-
-
-
 module.exports = {
   registerUser,
   authUser,
