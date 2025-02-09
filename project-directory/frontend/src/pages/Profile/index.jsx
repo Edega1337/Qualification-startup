@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Avatar, Box, Button, Typography, Link, Rating, Modal, Grid, TextField, MenuItem, Paper,
+  Avatar, Box, Button, Typography, Link, Rating, Modal, Grid, TextField, MenuItem, Paper, Card, CardContent, CardMedia, Chip, Divider,
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
-import { currentUserService } from '../../services';
 import { LocalizationProvider, DatePicker, PickersDay } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useQuery } from '@tanstack/react-query';
-import { sendAdService } from '../../services/index';
+import { currentUserService, sendAdService } from '../../services';
 import UpSideBar from '../../components/UI/UpSideBar';
 
 const ProfilePage = () => {
@@ -21,9 +20,27 @@ const ProfilePage = () => {
   const [price, setPrice] = useState('');
   const [photo, setPhoto] = useState(null);
 
+  const [notification, setNotification] = useState({
+    open: false,
+    message: '',
+  });
+
+  // Эффект для автоматического скрытия уведомления
+  useEffect(() => {
+    if (notification.open) {
+      const timer = setTimeout(() => {
+        setNotification({ ...notification, open: false });
+      }, 3000); // Уведомление исчезнет через 3 секунды
+
+      return () => clearTimeout(timer); // Очистка таймера при размонтировании компонента
+    }
+  }, [notification]);
+
+  // Запрос данных профиля пользователя
   const getProfile = async () => {
     try {
       const result = await currentUserService();
+      console.log("Результат получения профиля пользователя.", result);
       return result;
     } catch (err) {
       console.error(err);
@@ -35,13 +52,14 @@ const ProfilePage = () => {
     queryFn: getProfile,
   });
 
+
   if (isLoading) return <p>Загрузка...</p>;
   if (error) return <p>Ошибка: {error.message}</p>;
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = async () => {
+  const sendUserAdForm = async () => {
     const formData = new FormData();
 
     // Добавляем данные в formData
@@ -64,71 +82,69 @@ const ProfilePage = () => {
       // Отправляем данные через сервис
       const result = await sendAdService(formData);
       console.log('Результат отправления', result);
+
+      // Показываем уведомление
+      setNotification({
+        open: true,
+        message: 'Ваше объявление успешно размещено и находится на рассмотрении.',
+      });
+
       handleClose(); // Закрываем модальное окно после отправки
     } catch (error) {
       console.error('Ошибка отправки формы:', error);
+      setNotification({
+        open: true,
+        message: 'Произошла ошибка при отправке формы. Пожалуйста, попробуйте снова.',
+      });
     }
   };
-
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        padding: 4,
-        maxWidth: 600,
-        margin: '0 auto',
-      }}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'row', padding: 4, maxWidth: 1400, margin: '0 auto', gap: 4 }}>
       <UpSideBar />
-      <Box sx={{ width: '30%', textAlign: 'center', marginRight: 3 }}>
-        <Box sx={{ position: 'relative', display: 'inline-block' }}>
-          <Avatar
-            alt="User Avatar"
-            src="your-image-url" // replace with a real image URL
-            sx={{ width: 100, height: 100 }}
-          />
-          <PhotoCamera
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              right: -10,
-              backgroundColor: 'white',
-              borderRadius: '50%',
-              padding: 0.5,
-              fontSize: 20,
-            }}
-          />
-        </Box>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', marginTop: 2 }}>
-          {data.login}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Rating value={0} readOnly />
-          <Link href="#" sx={{ marginLeft: 1, fontSize: 14 }}>
-            Нет отзывов
-          </Link>
-        </Box>
-      </Box>
 
-      <Box sx={{ width: '70%' }}>
-        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-          Объявлений пока нет
-        </Typography>
-        <Typography sx={{ marginTop: 1, color: 'text.secondary' }}>
-          Но это легко исправить — разместите первое
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ marginTop: 3, paddingX: 4, paddingY: 1 }}
-          onClick={handleOpen}
-        >
-          Разместить объявление
-        </Button>
-      </Box>
+      <Grid container spacing={3}>
+        {/* Левая панель с профилем */}
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ padding: 3, textAlign: 'center' }}>
+            <Avatar src="your-image-url" sx={{ width: 120, height: 120, margin: '0 auto' }} />
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>{data.login}</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
+              <Rating value={0} readOnly />
+              <Link href="#" sx={{ marginLeft: 1, fontSize: 14 }}>Нет отзывов</Link>
+            </Box>
+          </Paper>
+        </Grid>
 
+        {/* Правая панель с объявлениями */}
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} sx={{ padding: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>Мои объявления</Typography>
+            <Button variant="contained" color="primary" fullWidth sx={{ mb: 3 }} onClick={() => setOpen(true)}>
+              Разместить объявление
+            </Button>
+            <Divider sx={{ mb: 2 }} />
+            <Grid container spacing={3}>
+              {data.ads.map((ad, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card>
+                    {ad.photo && <CardMedia component="img" height="140" image={ad.photo} alt={ad.title} />}
+                    <CardContent>
+                      <Typography variant="h6">{ad.name}</Typography> {/* Исправлено с ad.title на ad.name */}
+                      <Chip label={ad.typeOfTrening} color="primary" size="small" sx={{ my: 1 }} /> {/* Исправлено с ad.trainingType на ad.typeOfTrening */}
+                      <Typography variant="body2">{ad.description}</Typography>
+                      <Typography variant="h6" sx={{ mt: 1 }}>{ad.price} руб.</Typography>
+                      <Typography variant="body2">Дата: {new Date(ad.date).toLocaleDateString()}</Typography> {/* Исправлено с ad.selectedDate на ad.date */}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+
+      {/* Модальное окно */}
+      {/* Модальное окно для размещения объявления */}
       <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -234,7 +250,7 @@ const ProfilePage = () => {
                   color="primary"
                   fullWidth
                   size="large"
-                  onClick={handleSubmit}
+                  onClick={sendUserAdForm}
                 >
                   Отправить анкету
                 </Button>

@@ -1,7 +1,15 @@
-const { Users } = require("../models/sequalize");
-const { removeToken, validateRefreshToken, tokenService } = require("./token-service");
+const { Users, adUsers } = require("../models/sequalize");
+const {
+  removeToken,
+  validateRefreshToken,
+  tokenService,
+} = require("./token-service");
 const UserDto = require("../dtos/user-dto");
-const { RefreshTokenError, InternalServerError, NotFoundUser } = require("../middleware/error-handler");
+const {
+  RefreshTokenError,
+  InternalServerError,
+  NotFoundUser,
+} = require("../middleware/error-handler");
 
 const activate = async (activationLink) => {
   try {
@@ -53,16 +61,24 @@ const refreshFunc = async (refreshToken) => {
 
 const getUserInfo = async (id) => {
   try {
-    const existingUser = await Users.findOne({ where: { id: id } });
+    const existingUser = await Users.findOne({
+      where: { id: id },
+      include: [{
+        model: adUsers,
+        as: 'ads',
+      }]
+    });
+
     if (!existingUser) {
       throw new NotFoundUser("User not found");
     }
+
     const userDto = new UserDto(existingUser);
-    return userDto;
+    return userDto.toJSON(); // Возвращаем данные в формате JSON
   } catch (err) {
     console.log(err);
     throw err;
   }
-}
+};
 
 module.exports = { activate, logoutUser, refreshFunc, getUserInfo };
