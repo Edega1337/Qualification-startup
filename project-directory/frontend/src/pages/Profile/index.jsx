@@ -99,7 +99,7 @@ const ProfilePage = () => {
     }
   };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', padding: 4, maxWidth: 1400, margin: '0 auto', gap: 4 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row', padding: '5em', maxWidth: 1400, margin: '0 auto', gap: 4 }}>
       <UpSideBar />
 
       <Grid container spacing={3}>
