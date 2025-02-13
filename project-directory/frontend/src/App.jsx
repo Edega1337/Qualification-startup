@@ -3,7 +3,7 @@ import PrivateRoute from "./components/HOC/PrivateRoute";
 import { ThemeProvider } from '@material-ui/core/styles';
 import SignIn from "./pages/Authentication/SighIn"
 import Content from "../src/pages/Content";
-import ProfilePage from "../src/pages/Profile";
+import ProfilePage from "../src/pages/Profile/ProfilePage";
 import SignUp from "./pages/Registration/SignUp";
 import theme from "./theme";
 import "./App.css";

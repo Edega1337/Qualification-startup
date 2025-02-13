@@ -8,17 +8,26 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useQuery } from '@tanstack/react-query';
 import { currentUserService, sendAdService } from '../../services';
 import UpSideBar from '../../components/UI/UpSideBar';
+import UserInfo from '../Profile/UserInfo';
 
 const ProfilePage = () => {
-  const [open, setOpen] = useState(false);
+  const [openAdModal, setOpenAdModal] = useState(false); // Для модального окна объявления
+  const [openProfileModal, setOpenProfileModal] = useState(false); // Для модального окна профиля
+
+  // Состояния для формы
   const [trainingType, setTrainingType] = useState("Фитнес");
   const [selectedDate, setSelectedDate] = useState(null);
-
-  // States for form fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [photo, setPhoto] = useState(null);
+
+  // Функции для управления модальными окнами
+  const handleOpenAdModal = () => setOpenAdModal(true);
+  const handleCloseAdModal = () => setOpenAdModal(false);
+
+  const handleOpenProfileModal = () => setOpenProfileModal(true);
+  const handleCloseProfileModal = () => setOpenProfileModal(false);
 
   const [notification, setNotification] = useState({
     open: false,
@@ -52,28 +61,20 @@ const ProfilePage = () => {
     queryFn: getProfile,
   });
 
-
   if (isLoading) return <p>Загрузка...</p>;
   if (error) return <p>Ошибка: {error.message}</p>;
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
   const sendUserAdForm = async () => {
     const formData = new FormData();
-
-    // Добавляем данные в formData
     formData.append('title', title);
     formData.append('trainingType', trainingType);
     formData.append('description', description);
     formData.append('price', price);
 
-    // Если фото загружено, добавляем его
     if (photo) {
       formData.append('photo', photo);
     }
 
-    // Добавляем дату, если она выбрана
     if (selectedDate) {
       formData.append('selectedDate', selectedDate.toISOString()); // Преобразуем дату в ISO строку
     }
@@ -89,7 +90,7 @@ const ProfilePage = () => {
         message: 'Ваше объявление успешно размещено и находится на рассмотрении.',
       });
 
-      handleClose(); // Закрываем модальное окно после отправки
+      handleCloseAdModal(); // Закрываем модальное окно после отправки
     } catch (error) {
       console.error('Ошибка отправки формы:', error);
       setNotification({
@@ -98,28 +99,18 @@ const ProfilePage = () => {
       });
     }
   };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', padding: '5em', maxWidth: 1400, margin: '0 auto', gap: 4 }}>
       <UpSideBar />
 
       <Grid container spacing={3}>
-        {/* Левая панель с профилем */}
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ padding: 3, textAlign: 'center' }}>
-            <Avatar src="your-image-url" sx={{ width: 120, height: 120, margin: '0 auto' }} />
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>{data.login}</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
-              <Rating value={0} readOnly />
-              <Link href="#" sx={{ marginLeft: 1, fontSize: 14 }}>Нет отзывов</Link>
-            </Box>
-          </Paper>
-        </Grid>
-
+        <UserInfo />
         {/* Правая панель с объявлениями */}
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ padding: 3 }}>
             <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>Мои объявления</Typography>
-            <Button variant="contained" color="primary" fullWidth sx={{ mb: 3 }} onClick={() => setOpen(true)}>
+            <Button variant="contained" color="primary" fullWidth sx={{ mb: 3 }} onClick={handleOpenAdModal}>
               Разместить объявление
             </Button>
             <Divider sx={{ mb: 2 }} />
@@ -129,11 +120,11 @@ const ProfilePage = () => {
                   <Card>
                     {ad.photo && <CardMedia component="img" height="140" image={ad.photo} alt={ad.title} />}
                     <CardContent>
-                      <Typography variant="h6">{ad.name}</Typography> {/* Исправлено с ad.title на ad.name */}
-                      <Chip label={ad.typeOfTrening} color="primary" size="small" sx={{ my: 1 }} /> {/* Исправлено с ad.trainingType на ad.typeOfTrening */}
+                      <Typography variant="h6">{ad.name}</Typography>
+                      <Chip label={ad.typeOfTrening} color="primary" size="small" sx={{ my: 1 }} />
                       <Typography variant="body2">{ad.description}</Typography>
                       <Typography variant="h6" sx={{ mt: 1 }}>{ad.price} руб.</Typography>
-                      <Typography variant="body2">Дата: {new Date(ad.date).toLocaleDateString()}</Typography> {/* Исправлено с ad.selectedDate на ad.date */}
+                      <Typography variant="body2">Дата: {new Date(ad.date).toLocaleDateString()}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -143,9 +134,8 @@ const ProfilePage = () => {
         </Grid>
       </Grid>
 
-      {/* Модальное окно */}
       {/* Модальное окно для размещения объявления */}
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={openAdModal} onClose={handleCloseAdModal}>
         <Box
           sx={{
             position: 'absolute',
@@ -259,7 +249,7 @@ const ProfilePage = () => {
           </Paper>
         </Box>
       </Modal>
-    </Box>
+    </Box >
   );
 };
 
