@@ -44,8 +44,10 @@ const getUser = async (body) => {
 
 const createUser = async (body) => {
   try {
-    const { email, login, password } = body;
+    const { email, login, password, name, city, phoneNumber, bio } = body;
     console.log("Начало поиска");
+    console.log("Что мы получили от пользователя:", body);
+
     const existingUser = await Users.findOne({
       where: {
         [Op.or]: [
@@ -55,8 +57,12 @@ const createUser = async (body) => {
       }
     });
 
-    if (existingUser !== null) {
-      throw new BadRequestError('Пользователь с таким логином или почтой уже зарегистрирован');
+    if (existingUser) {
+      // Чёткая формулировка — уточняем что занято
+      let conflictField = existingUser.email === email ? 'email' : 'login';
+      const error = new Error(`Пользователь с таким ${conflictField} уже существует`);
+      error.statusCode = 409; // стандарт для конфликтов
+      throw error;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -68,15 +74,17 @@ const createUser = async (body) => {
       email,
       login,
       password: hashedPassword,
-      activationLink
+      activationLink,
+      name,
+      city,
+      phoneNumber,
+      bio
     });
-
 
     await mailService(email, `${process.env.API_URL}/activate/${activationLink}`);
 
     const userDto = new UserDto(newUser);
     const tokens = await tokenService(userDto.toPayload());
-
     await saveToken(userDto.toJSON().id, tokens.refreshToken);
 
     return {
@@ -85,9 +93,13 @@ const createUser = async (body) => {
         ...tokens
       }
     };
-  }
-  catch (err) {
-    return err;
+  } catch (err) {
+    console.error("Ошибка при создании пользователя:", err);
+
+    return {
+      status: err.statusCode || 500,
+      error: err.message || 'Ошибка сервера при регистрации'
+    };
   }
 };
 

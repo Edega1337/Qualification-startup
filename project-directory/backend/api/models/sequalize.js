@@ -86,12 +86,32 @@ const Users = sequelize.define(
       allowNull: false,
     },
     isActivated: {
-      type: BOOLEAN,
+      type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
     activationLink: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    avatarUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
@@ -185,7 +205,7 @@ adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
 (async () => {
   try {
-    const forceBD = false;
+    const forceBD = true;
     await Users.sync({ force: forceBD });
     await TokenSchema.sync({ force: forceBD });
     await adUsers.sync({ force: forceBD });

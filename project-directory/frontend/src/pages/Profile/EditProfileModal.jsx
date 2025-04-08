@@ -29,7 +29,7 @@ const EditProfileModal = ({ open, onClose, onSave }) => {
           <Grid container spacing={1.5}>
             <Grid item xs={12}>
               <TextField
-                label="Название"
+                label="Имя"
                 fullWidth
                 variant="outlined"
                 required
