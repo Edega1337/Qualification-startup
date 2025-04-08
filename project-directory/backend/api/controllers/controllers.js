@@ -8,8 +8,11 @@ const { getProfileUsers } = require("../services/profile-view");
 const AdService = require("../services/upload-service");
 
 
-const handleErrorResponse = (res, error, defaultStatus = 500) => {
-  res.status(error.status || defaultStatus).send({ error: error.message || "Internal Server Error" });
+const handleErrorResponse = (res, error) => {
+  const statusCode = error.statusCode || error.status || 500;
+  const message = error.message || 'Внутренняя ошибка сервера';
+
+  res.status(statusCode).send({ message });
 };
 
 
@@ -26,9 +29,11 @@ const registerUser = async (req, res) => {
     setRefreshTokenCookie(res, data.refreshToken);
     res.status(201).send({ accessToken: data.accessToken });
   } catch (error) {
+    console.error("Ошибка в контроллере регистрации:", error);
     handleErrorResponse(res, error);
   }
 };
+
 
 const authUser = async (req, res) => {
   try {

@@ -26,6 +26,7 @@ const signUpService = async (signUpData) => {
   }
   catch (error) {
     console.error('Ошибка регистрации', error);
+    throw error;
   }
 };
 

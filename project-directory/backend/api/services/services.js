@@ -58,11 +58,10 @@ const createUser = async (body) => {
     });
 
     if (existingUser) {
-      // Чёткая формулировка — уточняем что занято
-      let conflictField = existingUser.email === email ? 'email' : 'login';
+      const conflictField = existingUser.email === email ? 'email' : 'login';
       const error = new Error(`Пользователь с таким ${conflictField} уже существует`);
-      error.statusCode = 409; // стандарт для конфликтов
-      throw error;
+      error.statusCode = 409;
+      throw error; // ✅ Бросаем ошибку, а не возвращаем
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -93,15 +92,13 @@ const createUser = async (body) => {
         ...tokens
       }
     };
+
   } catch (err) {
     console.error("Ошибка при создании пользователя:", err);
-
-    return {
-      status: err.statusCode || 500,
-      error: err.message || 'Ошибка сервера при регистрации'
-    };
+    throw err; // ✅ Бросаем дальше, чтобы контроллер поймал в catch
   }
 };
+
 
 
 module.exports = { getUser, createUser };

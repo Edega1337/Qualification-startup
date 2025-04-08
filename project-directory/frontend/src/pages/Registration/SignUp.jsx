@@ -114,7 +114,6 @@ export default function SignUp() {
 
     let isValid = true;
 
-    // login
     if (!login || login.length < 3) {
       setLoginError(true);
       setLoginErrorMessage('Введите логин (минимум 3 символа).');
@@ -124,7 +123,6 @@ export default function SignUp() {
       setLoginErrorMessage('');
     }
 
-    // email
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage('Введите корректный email.');
@@ -134,7 +132,6 @@ export default function SignUp() {
       setEmailErrorMessage('');
     }
 
-    // password
     if (!password || password.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage('Пароль должен быть не короче 6 символов.');
@@ -144,25 +141,21 @@ export default function SignUp() {
       setPasswordErrorMessage('');
     }
 
-    // name
     if (!name || name.trim().length < 2) {
       alert("Пожалуйста, укажите имя (минимум 2 символа).");
       isValid = false;
     }
 
-    // city (optional)
     if (city && city.trim().length < 2) {
       alert("Город должен содержать минимум 2 символа.");
       isValid = false;
     }
 
-    // phone (optional)
     if (phone && !/^[\d+()\s-]{6,20}$/.test(phone)) {
       alert("Введите корректный номер телефона.");
       isValid = false;
     }
 
-    // bio (optional)
     if (bio && bio.length > 300) {
       alert("Описание должно быть не длиннее 300 символов.");
       isValid = false;

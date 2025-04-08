@@ -205,7 +205,7 @@ adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
 (async () => {
   try {
-    const forceBD = true;
+    const forceBD = false;
     await Users.sync({ force: forceBD });
     await TokenSchema.sync({ force: forceBD });
     await adUsers.sync({ force: forceBD });
