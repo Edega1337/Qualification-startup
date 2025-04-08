@@ -80,6 +80,12 @@ class ForbiddenError extends CustomError {
   }
 }
 
+class errorRegistration extends CustomError {
+  constructor(message = "Registration", code = "ERROR_REGISTRATION") {
+    super(message, 404, code);
+  }
+}
+
 module.exports = {
   RefreshTokenError,
   AuthorizationError,
@@ -92,5 +98,6 @@ module.exports = {
   SendMailError,
   VerifyError,
   AccessTokenError,
-  NotFoundUser
+  NotFoundUser,
+  errorRegistration
 };

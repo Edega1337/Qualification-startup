@@ -45,7 +45,6 @@ class UserDto {
     return {
       id: this.id,
       login: this.login,
-      ads: this.ads, // Включаем объявления в payload (если нужно)
     };
   }
 

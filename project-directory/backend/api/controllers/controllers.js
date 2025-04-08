@@ -2,15 +2,16 @@ const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
-const { createUser, getUser } = require("../services/services");
+const { createUser, getUser } = require("../services/services.js");
 const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
 const AdService = require("../services/upload-service");
 
 
-const handleErrorResponse = (res, error, defaultStatus = "No name error") => {
-  res.status(error.status || defaultStatus).send(error);
+const handleErrorResponse = (res, error, defaultStatus = 500) => {
+  res.status(error.status || defaultStatus).send({ error: error.message || "Internal Server Error" });
 };
+
 
 const setRefreshTokenCookie = (res, token) => {
   res.cookie("refreshToken", token, {

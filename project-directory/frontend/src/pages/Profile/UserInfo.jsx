@@ -3,15 +3,10 @@ import { Box, Grid, Button } from '@mui/material';
 import ProfileCard from '../Profile/ProfileCard';
 import EditProfileModal from '../Profile/EditProfileModal';
 
-const UserInfo = () => {
+const UserInfo = (
+  { userData }
+) => {
   const [openProfileModal, setOpenProfileModal] = useState(false);
-  const [user, setUser] = useState({
-    avatar: "your-image-url",
-    login: "User123",
-    rating: 0,
-    reviews: 0,
-  });
-
   const handleOpenProfileModal = () => setOpenProfileModal(true);
   const handleCloseProfileModal = () => setOpenProfileModal(false);
 
@@ -21,19 +16,21 @@ const UserInfo = () => {
   };
 
   return (
-    <Box>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <ProfileCard user={user} />
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2 }}
-            onClick={handleOpenProfileModal}
-          >
-            Редактировать профиль
-          </Button>
+    <Box sx={{ display: 'flex', mt: 4 }}>
+      <Grid container spacing={3} justifyContent="center">
+        <Grid item xs={12} sm={8} md={6} lg={4}>
+          <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <ProfileCard user={userData} />
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ mt: 2, px: 3, py: 1.5 }}
+              onClick={handleOpenProfileModal}
+            >
+              Редактировать профиль
+            </Button>
+
+          </Box>
         </Grid>
       </Grid>
       <EditProfileModal open={openProfileModal} onClose={handleCloseProfileModal} onSave={handleSaveProfile} />

@@ -19,9 +19,14 @@ const getUserInfo = () => {
 }
 
 const signUpService = async (signUpData) => {
-  const response = await $api.post(`/registration`, signUpData);
+  try {
+    const response = await $api.post(`/registration`, signUpData);
 
-  return response.data;
+    return response.data;
+  }
+  catch (error) {
+    console.error('Ошибка регистрации', error);
+  }
 };
 
 const logInService = async (loginData) => {

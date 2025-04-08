@@ -29,6 +29,7 @@ const mailService = async (to, link) => {
         </div>
       `
     });
+    console.log("Сообщение успешно отправлено");
     return {
       message: 'Email sent successfully',
       status: 200

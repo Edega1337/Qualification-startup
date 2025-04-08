@@ -31,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '0.85rem',
     marginTop: theme.spacing(0.5),
     textAlign: 'center',
+    padding: '1em'
   },
   submitButton: {
     width: '100%',
@@ -78,21 +79,29 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setGeneralError(''); // Сброс общего сообщения об ошибке
+
     if (validateInputs()) {
       const dataObject = {
         login: loginRef.current.value,
         password: passwordRef.current.value,
-      }
+      };
+
       try {
         const result = await logInService(dataObject);
         setAccessToken(result.accessToken);
         navigate("/");
       } catch (err) {
-        // Обработка ошибки, если логин или пароль неверны
-        setGeneralError('Неправильный логин или пароль. Пожалуйста, попробуйте еще раз.');
+        console.log(err);
+
+        if (err.response && err.response.status === 401) {
+          setGeneralError('Почта данного пользователя не активирована');
+        } else {
+          setGeneralError('Неправильный логин или пароль. Пожалуйста, попробуйте еще раз.');
+        }
       }
     }
   };
+
 
   const validateInputs = () => {
     const login = loginRef.current.value;

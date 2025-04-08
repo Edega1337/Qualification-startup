@@ -62,6 +62,7 @@ export default function SignUp() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (validateInputs()) {
+      
       const dataObject = {
         email: emailRef.current.value,
         login: loginRef.current.value,
