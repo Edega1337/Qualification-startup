@@ -1,14 +1,31 @@
-import React from 'react';
+import { React, useState } from 'react';
 import { TextField, Button, Grid, Typography, Container, Paper, MenuItem } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-const TrainerAdForm = () => {
-  const [selectedDate, setSelectedDate] = React.useState(null);
+const TrainerAdForm = ({ onSubmit }) => {
+  const [title, setTitle] = useState('');
+  const [trainingType, setTrainingType] = useState('Фитнес');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [photo, setPhoto] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('trainingType', trainingType);
+    formData.append('description', description);
+    formData.append('price', price);
+    if (photo) formData.append('photo', photo);
+    if (selectedDate) formData.append('selectedDate', selectedDate.toISOString());
+
+    onSubmit(formData);
+  };
   return (
     <Container maxWidth="sm">
-      <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
+      <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }} component="form" onSubmit={handleSubmit}>
         <Typography variant="h5" align="center" gutterBottom>
           Создать объявление тренера
         </Typography>
@@ -20,6 +37,8 @@ const TrainerAdForm = () => {
               fullWidth
               variant="outlined"
               required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </Grid>
 
@@ -31,8 +50,9 @@ const TrainerAdForm = () => {
               variant="outlined"
               required
               select
+              value={trainingType}
+              onChange={(e) => setTrainingType(e.target.value)}
             >
-              {/* Пример категорий */}
               <MenuItem value="Фитнес">Фитнес</MenuItem>
               <MenuItem value="Йога">Йога</MenuItem>
               <MenuItem value="Боевые искусства">Боевые искусства</MenuItem>
@@ -49,6 +69,8 @@ const TrainerAdForm = () => {
               multiline
               rows={4}
               required
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </Grid>
 
@@ -56,7 +78,7 @@ const TrainerAdForm = () => {
           <Grid item xs={12}>
             <Button variant="contained" component="label" fullWidth>
               Загрузить фото
-              <input type="file" hidden />
+              <input type="file" hidden onChange={(e) => setPhoto(e.target.files[0])} />
             </Button>
           </Grid>
 
@@ -68,10 +90,12 @@ const TrainerAdForm = () => {
               variant="outlined"
               type="number"
               required
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
             />
           </Grid>
 
-          {/* Возможные даты */}
+          {/* Дата */}
           <Grid item xs={12}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
@@ -83,65 +107,9 @@ const TrainerAdForm = () => {
             </LocalizationProvider>
           </Grid>
 
-          {/* Местоположение */}
-          <Grid item xs={12}>
-            <TextField
-              label="Местоположение"
-              fullWidth
-              variant="outlined"
-              required
-            />
-          </Grid>
-
-          {/* Опыт работы */}
-          <Grid item xs={12}>
-            <TextField
-              label="Опыт работы (лет)"
-              fullWidth
-              variant="outlined"
-              type="number"
-            />
-          </Grid>
-
-          {/* Контактная информация */}
-          <Grid item xs={12}>
-            <TextField
-              label="Контактная информация"
-              fullWidth
-              variant="outlined"
-              required
-            />
-          </Grid>
-
-          {/* Формат тренировки */}
-          <Grid item xs={12}>
-            <TextField
-              label="Формат тренировки"
-              fullWidth
-              variant="outlined"
-              select
-              required
-            >
-              <MenuItem value="Индивидуальные">Индивидуальные</MenuItem>
-              <MenuItem value="Групповые">Групповые</MenuItem>
-              <MenuItem value="Онлайн">Онлайн</MenuItem>
-            </TextField>
-          </Grid>
-
-          {/* Отзывы */}
-          <Grid item xs={12}>
-            <TextField
-              label="Отзывы клиентов (опционально)"
-              fullWidth
-              variant="outlined"
-              multiline
-              rows={3}
-            />
-          </Grid>
-
           {/* Кнопка отправки */}
           <Grid item xs={12}>
-            <Button variant="contained" color="primary" fullWidth size="large">
+            <Button type="submit" variant="contained" color="primary" fullWidth size="large">
               Отправить анкету
             </Button>
           </Grid>

@@ -1,0 +1,111 @@
+/* Для неавторизованного состояния */
+.non-auth {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #e4e6e6;
+
+  &__paper {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  &__heading {
+    margin-bottom: 1rem;
+  }
+
+  &__text {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Для авторизованного состояния */
+.content {
+  display: flex;
+  height: 100vh;
+  background-color: #e4e6e6;
+  padding-top: 4em;
+
+  /* Левая колонка: профиль пользователя */
+  &__profile {
+    background-color: #f3f3f3;
+    padding: 2rem;
+    padding-top: 4rem;
+    width: 25%;
+    min-width: 250px;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+  }
+
+  /* Правая колонка: переключатели и объявления */
+  &__switch {
+    flex-grow: 1;
+    padding: 2rem;
+    padding-top: 4rem;
+    overflow-y: auto;
+  }
+
+  /* Переключатель вкладок */
+  &__handle {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #444;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: #007bff;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+/* Карточки объявлений */
+.ads__card {
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  width: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  img {
+    width: 100%;
+    height: 240px; /* чуть больше, чтобы помещалось больше области фото */
+    object-fit: cover;
+    object-position: top;
+  }
+}
+
+.ads__card-content {
+  padding: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+  }
+
+  p {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #666;
+  }
+}

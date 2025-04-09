@@ -181,6 +181,10 @@ const adUsers = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    city_ad: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     moderation: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
