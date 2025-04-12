@@ -81,7 +81,8 @@
       display: flex;
       flex-wrap: wrap; /* Перенос элементов на новую строку */
       gap: 1.5rem; /* Расстояние между карточками */
-      justify-content: flex-start;
+      justify-content: center;
+      width: 40vw;
     }
   }
 

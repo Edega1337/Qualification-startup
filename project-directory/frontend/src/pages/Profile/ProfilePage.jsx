@@ -131,6 +131,7 @@ const ProfilePage = () => {
               }}
             >
               <TrainerAdForm onSubmit={sendUserAdForm} onClose={handleCloseAdModal} />
+
             </Box>
           </Modal>
         </div>

@@ -14,7 +14,9 @@ fastify.register(cookiePlugin, {
   parseOptions: {}, // Дополнительные параметры для парсинга cookie
 });
 
-fastify.register(multipart);
+fastify.register(multipart, {
+  attachFieldsToBody: true,
+});
 
 fastify.register(require("@fastify/cors"), {
   // Настройки CORS
@@ -63,6 +65,7 @@ fastify.register(
     instance.route(router().logout);
     instance.route(router().userMe);
     instance.route(router().profile);
+    instance.route(router().profileEdit);
     done();
   },
   { prefix: "/" }

@@ -37,7 +37,6 @@ const logInService = async (loginData) => {
 };
 
 const sendAdService = async (formData) => {
-  console.log(formData);
   const response = await $api.post('user/ad', formData);
 
   return response.data;
@@ -55,4 +54,16 @@ const currentUserService = async () => {
   return response.data;
 };
 
-export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService };
+const editUserProfileService = async (formData) => {
+  try {
+    const response = await $api.put(`/profile`, formData);
+
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка редактирования данных профиля');
+    throw error;
+  }
+
+}
+
+export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService };

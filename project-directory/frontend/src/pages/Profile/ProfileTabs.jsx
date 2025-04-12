@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
+import ProfileEditForm from './ProfileEditForm';
+import CustomButton from '../../components/UI/CustomButton/index';
+import { editUserProfileService } from '../../services/';
 import './ProfileTabs.scss'; // Подключи SCSS стили для табов
 
 const ProfileTabs = ({ userData, adsData, onOpenAdModal, handleDeleteAd }) => {
   const [activeTab, setActiveTab] = useState('ads');
-  console.log(adsData, "adsData");
-  console.log(userData, "userData");
+  const [handleEditProfile, setHandleEditProfile] = useState(false);
+
+  const openEditProfile = () => setHandleEditProfile(true);
+  const closeEditProfile = () => setHandleEditProfile(false);
+
+  const sendEditProfile = async (formData) => {
+    const profile = await editUserProfileService(formData);
+    console.log("Результат отправки профиля на сервер", profile);
+    return profile;
+  }
+
+  // console.log(adsData, "adsData");
+  // console.log(userData, "userData");
 
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
@@ -28,6 +42,46 @@ const ProfileTabs = ({ userData, adsData, onOpenAdModal, handleDeleteAd }) => {
         </button>
       </div>
       <div className="profile-tabs__content">
+        {activeTab === 'about' && (
+          <div className="profile-tabs__about">
+            <h2>О себе</h2>
+            <p>
+              <strong>Имя:</strong> {userData.name}
+            </p>
+            <p>
+              <strong>Email:</strong> {userData.email}
+            </p>
+            {userData.city && (
+              <p>
+                <strong>Город:</strong> {userData.city}
+              </p>
+            )}
+            {userData.phoneNumber && (
+              <p>
+                <strong>Номер телефона:</strong> {userData.phoneNumber}
+              </p>
+            )}
+            {userData.bio && (
+              <p>
+                <strong>О себе:</strong> {userData.bio}
+              </p>
+            )}
+            {/* Кнопка для открытия модального окна изменения профиля */}
+            {!handleEditProfile && <CustomButton onClick={openEditProfile} children={"Изменить профиль"} />}
+
+            {handleEditProfile && (
+              <ProfileEditForm
+                userData={userData}
+                onSubmit={(formData) => {
+                  console.log('Обновить профиль с данными', formData);
+                  sendEditProfile(formData);
+                  closeEditProfile();
+                }}
+                onClose={closeEditProfile}
+              />
+            )}
+          </div>
+        )}
         {activeTab === 'ads' && (
           <div className="profile-tabs__ads">
             <div className="profile-tabs__ads-header">

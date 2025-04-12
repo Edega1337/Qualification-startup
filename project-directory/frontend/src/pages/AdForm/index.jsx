@@ -7,6 +7,7 @@ const TrainerAdForm = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
   const [trainingType, setTrainingType] = useState('Фитнес');
   const [description, setDescription] = useState('');
+  const [cityAd, setCityAd] = useState('');
   const [price, setPrice] = useState('');
   const [photo, setPhoto] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -18,6 +19,7 @@ const TrainerAdForm = ({ onSubmit }) => {
     formData.append('trainingType', trainingType);
     formData.append('description', description);
     formData.append('price', price);
+    formData.append('city', cityAd);
     if (photo) formData.append('photo', photo);
     if (selectedDate) formData.append('selectedDate', selectedDate.toISOString());
 
@@ -92,6 +94,21 @@ const TrainerAdForm = ({ onSubmit }) => {
               required
               value={price}
               onChange={(e) => setPrice(e.target.value)}
+            />
+          </Grid>
+
+          {/* Город */}
+
+          <Grid item xs={12}>
+            <TextField
+              label="Город"
+              fullWidth
+              variant="outlined"
+              multiline
+              rows={4}
+              required
+              value={cityAd}
+              onChange={(e) => setCityAd(e.target.value)}
             />
           </Grid>
 

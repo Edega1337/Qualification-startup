@@ -11,7 +11,8 @@ const {
   activateUser,
   currentUser,
   profileUsers,
-  loadAd
+  loadAd,
+  editProfileUser
 } = require('../controllers/controllers');
 
 function router() {
@@ -78,6 +79,11 @@ function router() {
       method: 'POST',
       url: 'user/ad',
       handler: loadAd,
+    },
+    profileEdit: {
+      method: 'PUT',
+      url: 'profile',
+      handler: editProfileUser,
     }
   };
 }

@@ -81,4 +81,33 @@ const getUserInfo = async (id) => {
   }
 };
 
-module.exports = { activate, logoutUser, refreshFunc, getUserInfo };
+const updateUserProfile = async (userId, newProfileData) => {
+  try {
+    const user = await Users.findByPk(userId);
+    console.log("Полученные данные для обновления:", newProfileData);
+    if (!user) {
+      throw new NotFoundUser("User not found");
+    }
+
+    // Итерируем по ключам и присваиваем значение из свойства .value, если оно есть
+    Object.keys(newProfileData).forEach((key) => {
+      const field = newProfileData[key];
+      if (field && typeof field === 'object' && field.value !== undefined) {
+        user[key] = field.value;
+      } else if (field !== undefined) {
+        user[key] = field;
+      }
+    });
+
+    // Сохраняем изменения
+    await user.save();
+
+    const userDto = new UserDto(user);
+    return userDto.toJSON();
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+module.exports = { activate, logoutUser, refreshFunc, getUserInfo, updateUserProfile };
