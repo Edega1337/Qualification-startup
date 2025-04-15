@@ -4,7 +4,7 @@ const { adUsers } = require('../models/sequalize');
 class AdService {
   async saveAdData(adData, namePhoto, accessToken) {
     try {
-      const { title, trainingType, description, price, selectedDate } = adData;
+      const { title, trainingType, description, price, selectedDate, city } = adData;
       const { id } = jwtDecode(accessToken);
 
       await adUsers.create({
@@ -14,6 +14,7 @@ class AdService {
         namePhoto: namePhoto,
         price: price,
         date: selectedDate,
+        city_ad: city,
         moderation: false,
         userId: id,
       });

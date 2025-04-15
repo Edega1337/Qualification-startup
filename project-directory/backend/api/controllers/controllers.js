@@ -2,14 +2,17 @@ const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
-const { createUser, getUser } = require("../services/services");
-const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser } = require("../services/user-service");
+const { createUser, getUser } = require("../services/services.js");
+const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, deleteAdService, updateUserProfile } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
 const AdService = require("../services/upload-service");
 
 
-const handleErrorResponse = (res, error, defaultStatus = "No name error") => {
-  res.status(error.status || defaultStatus).send(error);
+const handleErrorResponse = (res, error) => {
+  const statusCode = error.statusCode || error.status || 500;
+  const message = error.message || 'Внутренняя ошибка сервера';
+
+  res.status(statusCode).send({ message });
 };
 
 const setRefreshTokenCookie = (res, token) => {
@@ -25,6 +28,7 @@ const registerUser = async (req, res) => {
     setRefreshTokenCookie(res, data.refreshToken);
     res.status(201).send({ accessToken: data.accessToken });
   } catch (error) {
+    console.error("Ошибка в контроллере регистрации:", error);
     handleErrorResponse(res, error);
   }
 };
@@ -90,6 +94,35 @@ const profileUsers = async (req, res) => {
   }
 };
 
+const editProfileUser = async (req, res) => {
+  try {
+    const updatedProfile = await updateUserProfile(req.user.id, req.body);
+
+    res.status(200).send({
+      message: 'Profile successfully edited',
+      bio: updatedProfile,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
+const deleteAdController = async (req, res) => {
+  try {
+    const adId = req.params.id;
+    const userId = req.user.id;
+
+    const result = await deleteAdService(userId, adId);
+
+    res.status(200).json({
+      message: "Объявление успешно удалено",
+      result,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
 const loadAd = async (req, res) => {
   try {
     const parts = [];
@@ -129,25 +162,11 @@ const loadAd = async (req, res) => {
         parts.push({ fieldname: part.fieldname, value: part.value });
       }
     }
-
+    console.log("adData, проверка что мы там отправляем", adData);
     const resultLoadAd = await AdService.saveAdData(adData, uploadedFileData.fileName, accessToken);
-
-
 
     // Выводим данные для отладки
     console.log('Результат сохранения объявления:', resultLoadAd);
-
-    // Пример использования данных
-    // const { title, trainingType, description, price, selectedDate } = adData;
-
-
-
-    // console.log(`Title: ${title}`);
-    // console.log(`Training Type: ${trainingType}`);
-    // console.log(`Description: ${description}`);
-    // console.log(`Price: ${price}`);
-    // console.log(`Selected Date: ${selectedDate}`);
-    // console.log(`Uploaded File Info:`, uploadedFileData);
 
     // Отправляем ответ
     res.status(200).send({
@@ -159,6 +178,8 @@ const loadAd = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   registerUser,
   authUser,
@@ -167,5 +188,7 @@ module.exports = {
   refresh,
   currentUser,
   profileUsers,
-  loadAd
+  loadAd,
+  editProfileUser,
+  deleteAdController
 };

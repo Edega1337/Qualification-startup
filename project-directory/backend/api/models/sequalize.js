@@ -7,6 +7,62 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
+// const Users = sequelize.define(
+//   "Users",
+//   {
+//     id: {
+//       type: DataTypes.INTEGER,
+//       autoIncrement: true,
+//       primaryKey: true,
+//     },
+//     email: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//       unique: true,
+//     },
+//     login: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//       unique: true,
+//     },
+//     nameUser: {
+//       type: DataTypes.STRING,
+//       allowNull: true,
+//     },
+//     password: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//     isActivated: {
+//       type: BOOLEAN,
+//       defaultValue: false,
+//     },
+//     activationLink: {
+//       type: DataTypes.STRING,
+//       allowNull: false,
+//     },
+//     reviews: {
+//       type: DataTypes.INTEGER,
+//       allowNull: true,
+//       defaultValue: 0,
+//     },
+//     photoUser: {
+//       type: DataTypes.STRING,
+//       allowNull: true,
+//     },
+//     rating: {
+//       type: DataTypes.FLOAT,
+//       allowNull: true,
+//       defaultValue: 0,
+//     },
+//   },
+//   {
+//     timestamps: true,
+//     createdAt: "created_at",
+//     updatedAt: "updated_at",
+//   }
+// );
+
 const Users = sequelize.define(
   "Users",
   {
@@ -30,12 +86,32 @@ const Users = sequelize.define(
       allowNull: false,
     },
     isActivated: {
-      type: BOOLEAN,
+      type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
     activationLink: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    avatarUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
@@ -72,7 +148,7 @@ const TokenSchema = sequelize.define(
   }
 );
 
-//Модель хранения объявлений
+// Модель хранения объявлений
 const adUsers = sequelize.define(
   "adUsers",
   {
@@ -105,8 +181,12 @@ const adUsers = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    city_ad: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     moderation: {
-      type: BOOLEAN,
+      type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
     userId: {
@@ -124,15 +204,15 @@ const adUsers = sequelize.define(
 );
 
 // Определяем ассоциации с алиасами
-Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads' }); // Указываем алиас 'ads'
-adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' }); // Алиас для обратной связи (опционально)
-
+Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads', onDelete: 'CASCADE' }); // Добавлено onDelete
+adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
 (async () => {
   try {
-    await Users.sync({ force: false }); // Синхронизируем модель users, если в базе данных не создана модель, написать true, после выполнения сразу написать false
-    await TokenSchema.sync({ force: false });
-    await adUsers.sync({ force: false });
+    const forceBD = false;
+    await Users.sync({ force: forceBD });
+    await TokenSchema.sync({ force: forceBD });
+    await adUsers.sync({ force: forceBD });
     await sequelize.authenticate();
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {

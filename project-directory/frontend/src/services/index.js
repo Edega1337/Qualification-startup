@@ -19,9 +19,15 @@ const getUserInfo = () => {
 }
 
 const signUpService = async (signUpData) => {
-  const response = await $api.post(`/registration`, signUpData);
+  try {
+    const response = await $api.post(`/registration`, signUpData);
 
-  return response.data;
+    return response.data;
+  }
+  catch (error) {
+    console.error('Ошибка регистрации', error);
+    throw error;
+  }
 };
 
 const logInService = async (loginData) => {
@@ -31,7 +37,6 @@ const logInService = async (loginData) => {
 };
 
 const sendAdService = async (formData) => {
-  console.log(formData);
   const response = await $api.post('user/ad', formData);
 
   return response.data;
@@ -49,4 +54,27 @@ const currentUserService = async () => {
   return response.data;
 };
 
-export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService };
+const editUserProfileService = async (formData) => {
+  try {
+    const response = await $api.put(`/profile`, formData);
+
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка редактирования данных профиля');
+    throw error;
+  }
+
+};
+
+const deleteAdUser = async (adId) => {
+  try {
+    const response = await $api.delete(`/ads/${adId}`);
+    console.log('Объявление удалено', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при удалении объявления', error);
+    throw error;
+  }
+};
+
+export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService, deleteAdUser };

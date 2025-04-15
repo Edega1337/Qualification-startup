@@ -5,6 +5,9 @@ import { TextField, Button, Typography, Box, InputAdornment } from '@material-ui
 import PersonIcon from '@material-ui/icons/Person';
 import EmailIcon from '@material-ui/icons/Email';
 import LockIcon from '@material-ui/icons/Lock';
+import LocationCityIcon from '@material-ui/icons/LocationCity';
+import PhoneIcon from '@material-ui/icons/Phone';
+import InfoIcon from '@material-ui/icons/Info';
 import { signUpService } from '../../services/index';
 
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +54,10 @@ export default function SignUp() {
   const loginRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const nameRef = useRef(null);
+  const cityRef = useRef(null);
+  const phoneRef = useRef(null);
+  const bioRef = useRef(null);
 
   const [loginError, setLoginError] = useState(false);
   const [loginErrorMessage, setLoginErrorMessage] = useState('');
@@ -66,12 +73,32 @@ export default function SignUp() {
         email: emailRef.current.value,
         login: loginRef.current.value,
         password: passwordRef.current.value,
+        name: nameRef.current.value,
+        city: cityRef.current.value || null,
+        phoneNumber: phoneRef.current.value || null,
+        bio: bioRef.current.value || null,
       };
       try {
         await signUpService(dataObject);
         navigate("/login");
       } catch (err) {
         console.error(err);
+
+        if (err.response && err.response.data) {
+          const message = err.response.data.message;
+
+          if (message.includes("login")) {
+            setLoginError(true);
+            setLoginErrorMessage("Такой логин уже используется");
+          }
+
+          if (message.includes("email")) {
+            setEmailError(true);
+            setEmailErrorMessage("Такая почта уже используется");
+          }
+        } else {
+          alert("Произошла неизвестная ошибка. Попробуйте позже.");
+        }
       }
     }
   };
@@ -80,11 +107,16 @@ export default function SignUp() {
     const login = loginRef.current.value;
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
+    const name = nameRef.current.value;
+    const city = cityRef.current.value;
+    const phone = phoneRef.current.value;
+    const bio = bioRef.current.value;
+
     let isValid = true;
 
     if (!login || login.length < 3) {
       setLoginError(true);
-      setLoginErrorMessage('Please enter a valid login (at least 3 characters).');
+      setLoginErrorMessage('Введите логин (минимум 3 символа).');
       isValid = false;
     } else {
       setLoginError(false);
@@ -93,7 +125,7 @@ export default function SignUp() {
 
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+      setEmailErrorMessage('Введите корректный email.');
       isValid = false;
     } else {
       setEmailError(false);
@@ -102,11 +134,31 @@ export default function SignUp() {
 
     if (!password || password.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Пароль должен быть не короче 6 символов.');
       isValid = false;
     } else {
       setPasswordError(false);
       setPasswordErrorMessage('');
+    }
+
+    if (!name || name.trim().length < 2) {
+      alert("Пожалуйста, укажите имя (минимум 2 символа).");
+      isValid = false;
+    }
+
+    if (city && city.trim().length < 2) {
+      alert("Город должен содержать минимум 2 символа.");
+      isValid = false;
+    }
+
+    if (phone && !/^[\d+()\s-]{6,20}$/.test(phone)) {
+      alert("Введите корректный номер телефона.");
+      isValid = false;
+    }
+
+    if (bio && bio.length > 300) {
+      alert("Описание должно быть не длиннее 300 символов.");
+      isValid = false;
     }
 
     return isValid;
@@ -175,6 +227,85 @@ export default function SignUp() {
               startAdornment: (
                 <InputAdornment position="start">
                   <LockIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+        </Box>
+
+        <Box className={classes.formGroup}>
+          <TextField
+            type="text"
+            id="name"
+            name="name"
+            label="Имя"
+            variant="outlined"
+            inputRef={nameRef}
+            required
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
+        <Box className={classes.formGroup}>
+          <TextField
+            type="text"
+            id="city"
+            name="city"
+            label="Город (необязательно)"
+            variant="outlined"
+            inputRef={cityRef}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LocationCityIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
+        <Box className={classes.formGroup}>
+          <TextField
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            label="Телефон (необязательно)"
+            variant="outlined"
+            inputRef={phoneRef}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
+        <Box className={classes.formGroup}>
+          <TextField
+            id="bio"
+            name="bio"
+            label="О себе (необязательно)"
+            variant="outlined"
+            inputRef={bioRef}
+            multiline
+            rows={3}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <InfoIcon color="action" />
                 </InputAdornment>
               ),
             }}

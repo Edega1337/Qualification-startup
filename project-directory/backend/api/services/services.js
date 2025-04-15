@@ -5,7 +5,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { mailService } = require('./mail-service');
 const { tokenService, saveToken } = require("./token-service");
-const { AuthorizationError, BadRequestError, VerifyError } = require("../middleware/error-handler");
+const { AuthorizationError, BadRequestError, VerifyError, errorRegistration } = require("../middleware/error-handler");
 const UserDto = require("../dtos/user-dto");
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
@@ -43,47 +43,62 @@ const getUser = async (body) => {
 }
 
 const createUser = async (body) => {
-  const { email, login, password } = body;
+  try {
+    const { email, login, password, name, city, phoneNumber, bio } = body;
+    console.log("Начало поиска");
+    console.log("Что мы получили от пользователя:", body);
 
-  const existingUser = await Users.findOne({
-    where: {
-      [Op.or]: [
-        { email: email },
-        { login: login }
-      ]
+    const existingUser = await Users.findOne({
+      where: {
+        [Op.or]: [
+          { email: email },
+          { login: login }
+        ]
+      }
+    });
+
+    if (existingUser) {
+      const conflictField = existingUser.email === email ? 'email' : 'login';
+      const error = new Error(`Пользователь с таким ${conflictField} уже существует`);
+      error.statusCode = 409;
+      throw error; // ✅ Бросаем ошибку, а не возвращаем
     }
-  });
 
-  if (existingUser !== null) {
-    throw new BadRequestError('Пользователь с таким логином или почтой уже зарегистрирован');
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const activationLink = uuidv4();
+
+    console.log("Ссылка для пользователя", activationLink);
+
+    const newUser = await Users.create({
+      email,
+      login,
+      password: hashedPassword,
+      activationLink,
+      name,
+      city,
+      phoneNumber,
+      bio
+    });
+
+    await mailService(email, `${process.env.API_URL}/activate/${activationLink}`);
+
+    const userDto = new UserDto(newUser);
+    const tokens = await tokenService(userDto.toPayload());
+    await saveToken(userDto.toJSON().id, tokens.refreshToken);
+
+    return {
+      status: 201,
+      data: {
+        ...tokens
+      }
+    };
+
+  } catch (err) {
+    console.error("Ошибка при создании пользователя:", err);
+    throw err; // ✅ Бросаем дальше, чтобы контроллер поймал в catch
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const activationLink = uuidv4();
-
-  const newUser = await Users.create({
-    email,
-    login,
-    password: hashedPassword,
-    activationLink,
-    coins: 0,
-    level: 0
-  });
-
-  await mailService(email, `${process.env.API_URL}/activate/${activationLink}`);
-
-  const userDto = new UserDto(newUser);
-  const tokens = await tokenService(userDto.toPayload());
-
-  await saveToken(userDto.toJSON().id, tokens.refreshToken);
-
-  return {
-    status: 201,
-    data: {
-      ...tokens
-    }
-  };
 };
+
 
 
 module.exports = { getUser, createUser };
