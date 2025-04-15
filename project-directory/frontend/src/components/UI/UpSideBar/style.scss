@@ -1,0 +1,70 @@
+// UpSideBar.scss
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+$primary-color: #3f51b5; // Цвет основного интерфейса
+$secondary-color: #f50057; // Цвет выделения
+$text-color: white; // Цвет текста
+
+.upSideBar {
+  font-family: "Open Sans", sans-serif; // Укажи нужный шрифт
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #3f51b5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Добавляем тень для читаемости
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    padding: 0 20px;
+
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: center; // Центрирование заголовка
+
+      .highlight {
+        color: $secondary-color;
+        font-weight: bold;
+      }
+    }
+
+    .title h1 {
+      margin: 0;
+      color: white;
+    }
+
+    .link {
+      margin: 0 10px; // Увеличиваем отступы для равномерности
+      color: $text-color;
+      font-size: 1.2rem; // Уменьшать шрифт для лучшего восприятия
+      text-decoration: none;
+
+      &:hover {
+        color: red;
+      }
+    }
+
+    .button {
+      margin: 0 10px; // Отступы
+      color: $text-color;
+      background: none; // Убираем фон
+      border: none; // Убираем границу
+      font-size: 1.2rem; // Увеличиваем размер текста
+
+      &:hover {
+        color: red;
+        cursor: pointer; // Курсор как указатель
+      }
+    }
+
+    .icon {
+      color: $text-color; // Цвет иконок
+      margin-right: 5px; // Отступ между иконкой и текстом
+    }
+  }
+}
