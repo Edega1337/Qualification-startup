@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import './style.scss'; // Здесь ваши глобальные SCSS-стили
 import { useQuery } from '@tanstack/react-query';
-import { currentUserService, sendAdService } from '../../services';
+import { currentUserService, sendAdService, deleteAdUser } from '../../services';
 import UpSideBar from '../../components/UI/UpSideBar';
 import UserInfo from '../Profile/UserInfo';
 import TrainerAdForm from '../AdForm';
@@ -78,8 +78,18 @@ const ProfilePage = () => {
   };
 
   // Обработчик удаления объявления (пока просто вывод в консоль)
-  const handleDeleteAd = (adId) => {
-    console.log("Удалить объявление с id", adId);
+  const handleDeleteAd = async (adId) => {
+    const resultDeleteAd = await deleteAdUser(adId);
+    // console.log(typeof (data.ads), "тип данных");
+    // data.ads.forEach((index) => {
+    //   console.log(index.id, "Элементы");
+    // });
+
+    console.log(resultDeleteAd, "Результат удаления");
+
+    data.ads = data.ads.filter((index) => { return index.id !== adId });
+
+    // console.log("Удалить объявление с id", adId);
   };
 
   return (

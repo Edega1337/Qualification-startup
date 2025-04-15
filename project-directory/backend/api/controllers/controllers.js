@@ -3,7 +3,7 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const { createUser, getUser } = require("../services/services.js");
-const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, updateUserProfile } = require("../services/user-service");
+const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, deleteAdService, updateUserProfile } = require("../services/user-service");
 const { getProfileUsers } = require("../services/profile-view");
 const AdService = require("../services/upload-service");
 
@@ -107,6 +107,22 @@ const editProfileUser = async (req, res) => {
   }
 };
 
+const deleteAdController = async (req, res) => {
+  try {
+    const adId = req.params.id;
+    const userId = req.user.id;
+
+    const result = await deleteAdService(userId, adId);
+
+    res.status(200).json({
+      message: "Объявление успешно удалено",
+      result,
+    });
+  } catch (error) {
+    handleErrorResponse(res, error);
+  }
+};
+
 const loadAd = async (req, res) => {
   try {
     const parts = [];
@@ -162,6 +178,8 @@ const loadAd = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   registerUser,
   authUser,
@@ -171,5 +189,6 @@ module.exports = {
   currentUser,
   profileUsers,
   loadAd,
-  editProfileUser
+  editProfileUser,
+  deleteAdController
 };

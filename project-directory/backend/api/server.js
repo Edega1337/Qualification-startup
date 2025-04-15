@@ -66,6 +66,7 @@ fastify.register(
     instance.route(router().userMe);
     instance.route(router().profile);
     instance.route(router().profileEdit);
+    instance.route(router().deleteAd);
     done();
   },
   { prefix: "/" }

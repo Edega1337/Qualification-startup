@@ -18,9 +18,6 @@ const ProfileTabs = ({ userData, adsData, onOpenAdModal, handleDeleteAd }) => {
     return profile;
   }
 
-  // console.log(adsData, "adsData");
-  // console.log(userData, "userData");
-
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
   };

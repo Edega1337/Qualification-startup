@@ -64,6 +64,17 @@ const editUserProfileService = async (formData) => {
     throw error;
   }
 
-}
+};
 
-export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService };
+const deleteAdUser = async (adId) => {
+  try {
+    const response = await $api.delete(`/ads/${adId}`);
+    console.log('Объявление удалено', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при удалении объявления', error);
+    throw error;
+  }
+};
+
+export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService, deleteAdUser };

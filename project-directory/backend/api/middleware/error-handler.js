@@ -62,6 +62,12 @@ class NotFoundUser extends CustomError {
   }
 }
 
+class NotFoundAd extends CustomError {
+  constructor(message = "Ad not found", code = "AD_NOT_FOUND") {
+    super(message, 404, code);
+  }
+}
+
 class BadRequestError extends CustomError {
   constructor(message = "Bad request", code = "BAD_REQUEST_ERROR") {
     super(message, 400, code);
@@ -99,5 +105,6 @@ module.exports = {
   VerifyError,
   AccessTokenError,
   NotFoundUser,
-  errorRegistration
+  errorRegistration,
+  NotFoundAd
 };

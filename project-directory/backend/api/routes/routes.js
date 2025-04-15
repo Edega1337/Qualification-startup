@@ -12,7 +12,8 @@ const {
   currentUser,
   profileUsers,
   loadAd,
-  editProfileUser
+  editProfileUser,
+  deleteAdController
 } = require('../controllers/controllers');
 
 function router() {
@@ -84,6 +85,11 @@ function router() {
       method: 'PUT',
       url: 'profile',
       handler: editProfileUser,
+    },
+    deleteAd: {
+      method: 'DELETE',
+      url: 'ads/:id',
+      handler: deleteAdController,
     }
   };
 }

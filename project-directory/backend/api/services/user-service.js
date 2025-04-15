@@ -9,6 +9,8 @@ const {
   RefreshTokenError,
   InternalServerError,
   NotFoundUser,
+  NotFoundAd,
+  ForbiddenError
 } = require("../middleware/error-handler");
 
 const activate = async (activationLink) => {
@@ -110,4 +112,31 @@ const updateUserProfile = async (userId, newProfileData) => {
   }
 };
 
-module.exports = { activate, logoutUser, refreshFunc, getUserInfo, updateUserProfile };
+const deleteAdService = async (userId, adId) => {
+  /**
+ * Удаляет объявление, если оно принадлежит пользователю с userId.
+ * @param {number|string} userId - Идентификатор текущего пользователя из req.user.
+ * @param {number|string} adId - Идентификатор объявления, которое требуется удалить.
+ * @returns {Promise<object>} - Объект с результатом (например, { adId }).
+ * @throws {NotFoundError} - Если объявление не найдено.
+ * @throws {ForbiddenError} - Если пользователь не является владельцем объявления.
+ */
+  // Находим объявление по его первичному ключу
+  const ad = await adUsers.findByPk(adId);
+  if (!ad) {
+    throw new NotFoundAd("Объявление не найдено");
+  }
+
+  // Проверяем, является ли текущий пользователь владельцем объявления
+  if (ad.userId !== userId) {
+    throw new ForbiddenError("Вы не можете удалить чужое объявление");
+  }
+
+  // Если проверка пройдена, удаляем объявление
+  await ad.destroy();
+
+  return { adId };
+
+};
+
+module.exports = { activate, logoutUser, refreshFunc, getUserInfo, updateUserProfile, deleteAdService };
