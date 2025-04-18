@@ -2,9 +2,18 @@ import React, { useState, useEffect } from "react";
 import UpSideBar from "../../components/UI/UpSideBar";
 import SearchBar from "../../components/UI/SearchBar";
 import { useDebounce } from "../../components/HOC/useDebounce";
+import SearchFilters from "../../components/UI/SearchFilters";
 import "./style.scss";
 
 const AdList = ({ recommendations = [] }) => {
+
+  const [filterState, setFilterState] = useState({
+    typeOfTrening: "",
+    priceRangeLabel: "",
+    minPrice: null,
+    maxPrice: null,
+  });
+
   recommendations = [
     {
       title: "Беспроводные наушники beats solo 3",
@@ -114,26 +123,34 @@ const AdList = ({ recommendations = [] }) => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500); // Задержка в 500 мс
 
   useEffect(() => {
-    if (!debouncedSearchTerm) {
-      setFilteredAds(recommendations);
-      return;
-    }
-
     const lowerCasedTerm = debouncedSearchTerm.toLowerCase();
-    setFilteredAds(
-      recommendations.filter(
-        (ad) =>
-          ad.title.toLowerCase().includes(lowerCasedTerm) ||
-          ad.type_of_trening.toLowerCase().includes(lowerCasedTerm)
-      )
-    );
-  }, [debouncedSearchTerm, recommendations]);
+
+    const filtered = recommendations.filter((ad) => {
+      const titleMatch = ad.title.toLowerCase().includes(lowerCasedTerm);
+      const typeMatch = ad.type_of_trening.toLowerCase().includes(lowerCasedTerm);
+
+      const typeFilterMatch = filterState.typeOfTrening
+        ? ad.type_of_trening === filterState.typeOfTrening
+        : true;
+
+      const price = typeof ad.price === "string" ? parseInt(ad.price) : ad.price;
+      const priceFilterMatch =
+        (!filterState.minPrice || price >= filterState.minPrice) &&
+        (!filterState.maxPrice || price <= filterState.maxPrice);
+
+      return (titleMatch || typeMatch) && typeFilterMatch && priceFilterMatch;
+    });
+
+    setFilteredAds(filtered);
+  }, [debouncedSearchTerm, recommendations, filterState]);
+
 
   return (
     <div className="container">
       <UpSideBar />
       <div className="stickySearchBar">
-        <SearchBar onSearch={setSearchTerm} /> {/* Теперь просто обновляем состояние */}
+        <SearchBar onSearch={setSearchTerm} />
+        <SearchFilters filters={filterState} onFilterChange={setFilterState} />
       </div>
       <div className="adsContainer">
         <h5 className="recommendationsTitle">Список объявлений</h5>

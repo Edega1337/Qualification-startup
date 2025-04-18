@@ -1,10 +1,17 @@
 import { Avatar, Box, Paper, Typography, Rating, Link } from '@mui/material';
 
 const ProfileCard = ({ user }) => {
-  console.log(user);
+  console.log(user.avatarUrl);
   return (
     <Paper elevation={3} sx={{ padding: 3, textAlign: 'center' }}>
-      <Avatar src={user.avatar} sx={{ width: 120, height: 120, margin: '0 auto' }} />
+      <Box sx={{ mt: 2 }}>
+        <img
+          src={user.avatarUrl}
+          alt="avatar-test"
+          style={{ width: 120, height: 120, borderRadius: '50%' }}
+        />
+      </Box>
+
       <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 2 }}>
         {user.name}
       </Typography>

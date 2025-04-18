@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const { createUser, getUser } = require("../services/services.js");
 const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, deleteAdService, updateUserProfile } = require("../services/user-service");
+const { searchAds } = require("../services/search-service.js")
 const { getProfileUsers } = require("../services/profile-view");
 const AdService = require("../services/upload-service");
 
@@ -94,18 +95,59 @@ const profileUsers = async (req, res) => {
   }
 };
 
+
 const editProfileUser = async (req, res) => {
   try {
-    const updatedProfile = await updateUserProfile(req.user.id, req.body);
+    const newProfileData = {};
+    let avatarReceived = false;
+
+    for await (const part of req.parts()) {
+      if (part.file) {
+        // Файл — неважно как называется поле
+        avatarReceived = true;
+        console.log("📸 Файл получен:", part.fieldname, part.filename);
+
+        const uniqueId = uuidv4();
+        const ext = path.extname(part.filename);
+        const uniqueFileName = `${uniqueId}${ext}`;
+        const uploadDir = path.join(__dirname, "../uploads", "avatars");
+
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        const filePath = path.join(uploadDir, uniqueFileName);
+        const writeStream = fs.createWriteStream(filePath);
+
+        await part.file.pipe(writeStream);
+
+        // 📌 ВАЖНО: сохраняем путь как avatarUrl — КОНКРЕТНО ЭТО ПОЛЕ
+        newProfileData.avatarUrl = `/uploads/avatars/${uniqueFileName}`;
+      } else {
+        // обычное текстовое поле
+        newProfileData[part.fieldname] = part.value;
+      }
+    }
+
+    if (!avatarReceived) {
+      console.log("⚠️ Файл не был передан");
+    }
+
+    console.log("📥 Собранные данные перед обновлением:", newProfileData);
+
+    const updatedProfile = await updateUserProfile(req.user.id, newProfileData);
 
     res.status(200).send({
-      message: 'Profile successfully edited',
-      bio: updatedProfile,
+      message: "Профиль успешно обновлён",
+      profile: updatedProfile,
     });
   } catch (error) {
-    handleErrorResponse(res, error);
+    console.error("❌ Ошибка при обновлении профиля:", error);
+    res.status(500).send({ message: "Ошибка при редактировании профиля", error });
   }
 };
+
+
 
 const deleteAdController = async (req, res) => {
   try {
@@ -178,6 +220,17 @@ const loadAd = async (req, res) => {
   }
 };
 
+const searchAd = async (req, res) => {
+  try {
+    const ads = await searchAds(req.query);
+    console.log("Результат поиска:", ads);
+    res.send(ads);
+  } catch (error) {
+    console.error("Ошибка при поиске объявлений:", error);
+    reply.status(500).send({ error: "Ошибка при поиске объявлений" });
+  }
+}
+
 
 
 module.exports = {
@@ -190,5 +243,6 @@ module.exports = {
   profileUsers,
   loadAd,
   editProfileUser,
-  deleteAdController
+  deleteAdController,
+  searchAd
 };

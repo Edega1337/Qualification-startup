@@ -34,7 +34,7 @@ const ProfileEditForm = ({ userData, onSubmit, onClose }) => {
     formData.append('city', city);
     formData.append('bio', bio);
     if (avatar) {
-      formData.append('avatar', avatar);
+      formData.append('avatarUrl', avatar);
     }
 
     // Отладочный вывод: проверяем содержимое FormData
@@ -59,7 +59,7 @@ const ProfileEditForm = ({ userData, onSubmit, onClose }) => {
           {/* Аватар и кнопка смены аватара */}
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Avatar
-              src={userData.avatarUrl || ''}
+              src={userData.avatar || ''}
               sx={{ width: 120, height: 120, margin: '0 auto' }}
             />
             <Button variant="contained" component="label" sx={{ mt: 1 }}>
