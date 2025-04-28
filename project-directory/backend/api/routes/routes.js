@@ -13,7 +13,8 @@ const {
   profileUsers,
   loadAd,
   editProfileUser,
-  deleteAdController
+  deleteAdController,
+  searchAd
 } = require('../controllers/controllers');
 
 function router() {
@@ -90,6 +91,11 @@ function router() {
       method: 'DELETE',
       url: 'ads/:id',
       handler: deleteAdController,
+    },
+    searchAds: {
+      method: 'GET',
+      url: 'ads/search',
+      handler: searchAd,
     }
   };
 }

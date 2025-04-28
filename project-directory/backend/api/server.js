@@ -15,7 +15,7 @@ fastify.register(cookiePlugin, {
 });
 
 fastify.register(multipart, {
-  attachFieldsToBody: true,
+  // attachFieldsToBody: true,
 });
 
 fastify.register(require("@fastify/cors"), {
@@ -52,6 +52,7 @@ fastify.register(
     instance.route(router().authorization);
     instance.route(router().refresh);
     instance.route(router().activate);
+    instance.route(router().searchAds);
     done();
   },
   { prefix: "/" }

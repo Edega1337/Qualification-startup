@@ -10,10 +10,12 @@ class UserDto {
   city;
   bio;
   avatarUrl;
-  Number;
+  phoneNumber;
   ads;
 
   constructor(model) {
+    const baseUrl = process.env.API_URL; // http://localhost:4000
+
     this.id = model.id;
     this.email = model.email;
     this.login = model.login;
@@ -22,9 +24,13 @@ class UserDto {
     this.city = model.city;
     this.bio = model.bio;
     this.phoneNumber = model.phoneNumber;
-    this.avatarUrl = model.avatarUrl;
 
-    // Добавляем данные объявлений, если они есть
+    // ✅ Формируем полный путь к аватару
+    this.avatarUrl = model.avatarUrl
+      ? `${baseUrl}${model.avatarUrl}`
+      : null;
+
+    // Объявления
     if (model.ads) {
       this.ads = model.ads.map(ad => ({
         id: ad.ad_id,
@@ -35,10 +41,12 @@ class UserDto {
         date: ad.date,
         moderation: ad.moderation,
         city_ad: ad.city_ad,
-        photo: ad.namePhoto ? `${process.env.API_URL + "/uploads/"}${ad.namePhoto}` : null, // Добавляем URL к фото
+        photo: ad.namePhoto
+          ? `${baseUrl}/uploads/${ad.namePhoto}`
+          : null,
       }));
     } else {
-      this.ads = []; // Если объявлений нет, возвращаем пустой массив
+      this.ads = [];
     }
   }
 
@@ -53,7 +61,7 @@ class UserDto {
       bio: this.bio,
       avatarUrl: this.avatarUrl,
       phoneNumber: this.phoneNumber,
-      ads: this.ads, // Включаем объявления в JSON
+      ads: this.ads,
     };
   }
 
@@ -68,7 +76,7 @@ class UserDto {
     return {
       id: this.id,
       login: this.login,
-      ads: this.ads, // Включаем объявления в профиль
+      ads: this.ads,
     };
   }
 }
