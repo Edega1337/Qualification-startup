@@ -1,5 +1,6 @@
 // src/components/AdList.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Link } from 'react-router-dom';
 import UpSideBar from "../../components/UI/UpSideBar";
 import SearchBar from "../../components/UI/SearchBar";
 import { useSearchAds } from "../../hooks/useSearchAds";
@@ -75,6 +76,7 @@ const AdList = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
   const scrollTop = () =>
     window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -118,28 +120,31 @@ const AdList = () => {
             const isNew =
               (new Date() - new Date(ad.date)) / (1000 * 60 * 60 * 24) < 7;
             return (
-              <div
+              <Link
                 key={ad.ad_id || index}
-                className="adCard"
+                to={`/ads/${ad.ad_id}`}
                 ref={isLast ? lastAdRef : null}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
               >
-                {isNew && <div className="badge">Новое</div>}
-                <img
-                  src={`http://localhost:4000/uploads/${ad.namePhoto}`}
-                  alt={ad.name}
-                  className="media"
-                />
-                <div className="title">{ad.name}</div>
-                <div className="price">{ad.price} ₽</div>
-                <div className="description">
-                  {ad.description?.length > 130
-                    ? ad.description.slice(0, 130) + '…'
-                    : ad.description || 'Описание отсутствует'}
+                <div className="adCard">
+                  {isNew && <div className="badge">Новое</div>}
+                  <img
+                    src={`http://localhost:4000/uploads/${ad.namePhoto}`}
+                    alt={ad.name}
+                    className="media"
+                  />
+                  <div className="title">{ad.name}</div>
+                  <div className="price">{ad.price} ₽</div>
+                  <div className="description">
+                    {ad.description?.length > 130
+                      ? ad.description.slice(0, 130) + '…'
+                      : ad.description || 'Описание отсутствует'}
+                  </div>
+                  <div className="details">
+                    <span>{ad.typeOfTrening}</span>
+                  </div>
                 </div>
-                <div className="details">
-                  <span>{ad.typeOfTrening}</span>
-                </div>
-              </div>
+              </Link>
             );
           })}
         </div>

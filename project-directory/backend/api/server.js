@@ -53,6 +53,7 @@ fastify.register(
     instance.route(router().refresh);
     instance.route(router().activate);
     instance.route(router().searchAds);
+    instance.route(router().getAd);
     done();
   },
   { prefix: "/" }
@@ -68,6 +69,8 @@ fastify.register(
     instance.route(router().profile);
     instance.route(router().profileEdit);
     instance.route(router().deleteAd);
+    instance.route(router().postResponse);
+    instance.route(router().listResponses);
     done();
   },
   { prefix: "/" }

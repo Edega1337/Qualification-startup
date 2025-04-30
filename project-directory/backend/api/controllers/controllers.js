@@ -6,6 +6,7 @@ const { createUser, getUser } = require("../services/services.js");
 const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, deleteAdService, updateUserProfile } = require("../services/user-service");
 const { searchAds } = require("../services/search-service.js")
 const { getProfileUsers } = require("../services/profile-view");
+const { getAdDetail, respondToAd, listResponses } = require("../services/ad-service.js")
 const AdService = require("../services/upload-service");
 
 
@@ -231,6 +232,43 @@ const searchAd = async (req, res) => {
   }
 }
 
+const getAd = async (req, res) => {
+  try {
+    const ad = await getAdDetail(req.params.id);
+    res.send(ad);
+  } catch (e) {
+    res.status(e.status || 500).send({ message: e.message });
+  }
+}
+
+// Отклик на объявление
+const postResponse = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).send({ message: 'Нужно авторизоваться' });
+    }
+    const newResp = await respondToAd(
+      req.params.id,
+      req.user.id,
+      { date: req.body.date, message: req.body.message }
+    );
+    res.send(newResp);
+  } catch (e) {
+    res.status(e.status || 500).send({ message: e.message });
+  }
+}
+
+// Список откликов (для владельца)
+const getResponses = async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).send({ message: 'Нужно авторизоваться' });
+    const list = await listResponses(req.params.id, req.user.id);
+    res.send(list);
+  } catch (e) {
+    res.status(e.status || 500).send({ message: e.message });
+  }
+}
+
 
 
 module.exports = {
@@ -244,5 +282,8 @@ module.exports = {
   loadAd,
   editProfileUser,
   deleteAdController,
-  searchAd
+  searchAd,
+  getAd,
+  postResponse,
+  getResponses
 };

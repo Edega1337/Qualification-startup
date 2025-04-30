@@ -77,4 +77,56 @@ const deleteAdUser = async (adId) => {
   }
 };
 
-export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService, deleteAdUser };
+/**
+ * Получить детали объявления по ID
+ * @param {number|string} adId
+ * @returns {Promise<object>} - данные объявления
+ */
+const getAdService = async (adId) => {
+  try {
+    const response = await $api.get(`/ads/${adId}`);
+    return response.data.ad || response.data;
+  } catch (error) {
+    console.error('Ошибка при получении деталей объявления', error);
+    throw error;
+  }
+};
+
+/**
+ * Получить список откликов к объявлению (для владельца)
+ * @param {number|string} adId
+ * @returns {Promise<Array>} - массив откликов
+ */
+const getAdResponsesService = async (adId) => {
+  try {
+    const response = await $api.get(`/ads/${adId}/responses`);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      return [];
+    }
+    console.error('Ошибка при получении списка откликов', error);
+    throw error;
+  }
+};
+
+/**
+ * Отправить отклик на объявление
+ * @param {number|string} adId
+ * @param {{ date: string, message: string }} payload
+ * @returns {Promise<object>} - созданный отклик
+ */
+const respondToAdService = async (adId, { date, message }) => {
+  try {
+    const response = await $api.post(
+      `/ads/${adId}/respond`,
+      { date, message }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при отправке отклика', error);
+    throw error;
+  }
+};
+
+export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService, deleteAdUser, getAdService, getAdResponsesService, respondToAdService };
