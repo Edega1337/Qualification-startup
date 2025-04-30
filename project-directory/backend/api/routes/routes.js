@@ -14,8 +14,11 @@ const {
   loadAd,
   editProfileUser,
   deleteAdController,
-  searchAd
+  searchAd,
+  getAd,
+  postResponse
 } = require('../controllers/controllers');
+const { listResponses } = require('../services/ad-service');
 
 function router() {
   return {
@@ -96,6 +99,21 @@ function router() {
       method: 'GET',
       url: 'ads/search',
       handler: searchAd,
+    },
+    getAd: {
+      method: 'GET',
+      url: 'ads/:id',
+      handler: getAd
+    },
+    postResponse: {
+      method: 'POST',
+      url: 'ads/:id/respond',
+      handler: postResponse,
+    },
+    listResponses: {
+      method: 'GET',
+      url: 'ads/:id/responses',
+      handler: listResponses,
     }
   };
 }
