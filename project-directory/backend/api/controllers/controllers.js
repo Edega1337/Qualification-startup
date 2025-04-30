@@ -3,7 +3,7 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const { createUser, getUser } = require("../services/services.js");
-const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, deleteAdService, updateUserProfile } = require("../services/user-service");
+const { activate, logoutUser, refreshFunc, getUserInfo, loadAdUser, deleteAdService, updateUserProfile, getResponsesForOwner } = require("../services/user-service");
 const { searchAds } = require("../services/search-service.js")
 const { getProfileUsers } = require("../services/profile-view");
 const { getAdDetail, respondToAd, listResponses } = require("../services/ad-service.js")
@@ -228,7 +228,7 @@ const searchAd = async (req, res) => {
     res.send(ads);
   } catch (error) {
     console.error("Ошибка при поиске объявлений:", error);
-    reply.status(500).send({ error: "Ошибка при поиске объявлений" });
+    res.status(500).send({ error: "Ошибка при поиске объявлений" });
   }
 }
 
@@ -236,8 +236,8 @@ const getAd = async (req, res) => {
   try {
     const ad = await getAdDetail(req.params.id);
     res.send(ad);
-  } catch (e) {
-    res.status(e.status || 500).send({ message: e.message });
+  } catch (err) {
+    handleErrorResponse(res, err);
   }
 }
 
@@ -253,8 +253,8 @@ const postResponse = async (req, res) => {
       { date: req.body.date, message: req.body.message }
     );
     res.send(newResp);
-  } catch (e) {
-    res.status(e.status || 500).send({ message: e.message });
+  } catch (err) {
+    handleErrorResponse(res, err);
   }
 }
 
@@ -264,12 +264,20 @@ const getResponses = async (req, res) => {
     if (!req.user) return res.status(401).send({ message: 'Нужно авторизоваться' });
     const list = await listResponses(req.params.id, req.user.id);
     res.send(list);
-  } catch (e) {
-    res.status(e.status || 500).send({ message: e.message });
+  } catch (err) {
+    handleErrorResponse(res, err);
   }
 }
 
-
+const userResponsesHandler = async (req, res) => {
+  try {
+    const ownerId = req.user.id;
+    const list = await getResponsesForOwner(ownerId);
+    res.status(200).send({ responses: list });
+  } catch (err) {
+    handleErrorResponse(res, err);
+  }
+}
 
 module.exports = {
   registerUser,
@@ -285,5 +293,6 @@ module.exports = {
   searchAd,
   getAd,
   postResponse,
-  getResponses
+  getResponses,
+  userResponsesHandler
 };

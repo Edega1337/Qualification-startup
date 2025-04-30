@@ -1,0 +1,48 @@
+.container {
+  padding: 1em;
+  padding-top: 5em;
+}
+
+.responses-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.response-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+
+  &__ad {
+    font-weight: 600;
+    text-decoration: none;
+    color: #3264fb;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  &__message,
+  &__date,
+  &__status {
+    margin-top: 8px;
+    font-size: 0.9rem;
+  }
+}

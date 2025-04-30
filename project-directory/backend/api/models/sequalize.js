@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, BOOLEAN } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -7,56 +7,21 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
+// Модель пользователя
 const Users = sequelize.define(
   "Users",
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    login: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    isActivated: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    activationLink: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    phoneNumber: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    bio: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    avatarUrl: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    login: { type: DataTypes.STRING, allowNull: false, unique: true },
+    password: { type: DataTypes.STRING, allowNull: false },
+    isActivated: { type: DataTypes.BOOLEAN, defaultValue: false },
+    activationLink: { type: DataTypes.STRING, allowNull: false },
+    name: { type: DataTypes.STRING, allowNull: true },
+    city: { type: DataTypes.STRING, allowNull: true },
+    phoneNumber: { type: DataTypes.STRING, allowNull: true },
+    bio: { type: DataTypes.TEXT, allowNull: true },
+    avatarUrl: { type: DataTypes.STRING, allowNull: true },
   },
   {
     timestamps: true,
@@ -65,130 +30,60 @@ const Users = sequelize.define(
   }
 );
 
-// Модель TokenSchema
+// Модель токенов
 const TokenSchema = sequelize.define(
   "TokenSchema",
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    refreshToken: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Users,
-        key: "id",
-      },
-    },
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    refreshToken: { type: DataTypes.STRING, allowNull: false },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Users, key: "id" } },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// Модель хранения объявлений
+// Модель объявлений
 const adUsers = sequelize.define(
   "adUsers",
   {
-    ad_id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    typeOfTrening: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    namePhoto: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    city_ad: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    moderation: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Users,
-        key: "id",
-      },
-    },
+    ad_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    typeOfTrening: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.STRING, allowNull: false },
+    namePhoto: { type: DataTypes.STRING, allowNull: false },
+    price: { type: DataTypes.INTEGER, allowNull: false },
+    date: { type: DataTypes.DATE, allowNull: false },
+    city_ad: { type: DataTypes.STRING, allowNull: false },
+    moderation: { type: DataTypes.BOOLEAN, defaultValue: false },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Users, key: "id" } },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-const Response = sequelize.define('Response', {
-  response_id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+// Модель откликов
+const Response = sequelize.define(
+  "Response",
+  {
+    response_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    adId: { type: DataTypes.INTEGER, allowNull: false, references: { model: adUsers, key: 'ad_id' } },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Users, key: 'id' } },
+    date: { type: DataTypes.DATE, allowNull: false },
+    message: { type: DataTypes.TEXT, allowNull: true },
+    status: { type: DataTypes.ENUM('new', 'viewed', 'accepted', 'rejected'), defaultValue: 'new' },
   },
-  adId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: { model: 'adUsers', key: 'ad_id' },
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: { model: 'Users', key: 'id' },
-  },
-  date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  message: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  status: {
-    type: DataTypes.ENUM('new', 'viewed', 'accepted', 'rejected'),
-    defaultValue: 'new',
-  },
-}, {
-  timestamps: true,
-});
+  { timestamps: true }
+);
 
-Response.associate = models => {
-  Response.belongsTo(models.adUsers, { foreignKey: 'adId' });
-  Response.belongsTo(models.Users, { foreignKey: 'userId' });
-};
-
-// Определяем ассоциации с алиасами
-Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads', onDelete: 'CASCADE' }); // Добавлено onDelete
+// Ассоциации
+Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads', onDelete: 'CASCADE' });
 adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
+adUsers.hasMany(Response, { foreignKey: 'adId', as: 'responses', onDelete: 'CASCADE' });
+Response.belongsTo(adUsers, { foreignKey: 'adId', as: 'ad' });
 
+Users.hasMany(Response, { foreignKey: 'userId', as: 'responsesByUser', onDelete: 'CASCADE' });
+Response.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
+
+// Синхронизация и проверка соединения
 (async () => {
   try {
     const forceBD = false;
@@ -200,7 +95,7 @@ adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {
     console.log("Невозможно выполнить подключение к БД: ", e);
-    return 1;
+    process.exit(1);
   }
 })();
 

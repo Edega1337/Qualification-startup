@@ -129,4 +129,14 @@ const respondToAdService = async (adId, { date, message }) => {
   }
 };
 
-export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService, deleteAdUser, getAdService, getAdResponsesService, respondToAdService };
+const getMyResponses = async () => {
+  try {
+    const response = await $api.get('/user/responses');
+    return response.data.responses;
+  } catch (error) {
+    console.error('Ошибка при получении откликов:', error);
+    throw error;
+  }
+};
+
+export { logInService, signUpService, refreshTokenService, currentUserService, getUserInfo, sendAdService, editUserProfileService, deleteAdUser, getAdService, getAdResponsesService, respondToAdService, getMyResponses };

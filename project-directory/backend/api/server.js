@@ -71,6 +71,7 @@ fastify.register(
     instance.route(router().deleteAd);
     instance.route(router().postResponse);
     instance.route(router().listResponses);
+    instance.route(router().userResponses);
     done();
   },
   { prefix: "/" }
