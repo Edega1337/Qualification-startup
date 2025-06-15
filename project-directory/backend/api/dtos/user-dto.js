@@ -12,9 +12,10 @@ class UserDto {
   avatarUrl;
   phoneNumber;
   ads;
+  role; // 'client' | 'coach'
 
   constructor(model) {
-    const baseUrl = process.env.API_URL; // http://localhost:4000
+    const baseUrl = process.env.API_URL;
 
     this.id = model.id;
     this.email = model.email;
@@ -24,15 +25,12 @@ class UserDto {
     this.city = model.city;
     this.bio = model.bio;
     this.phoneNumber = model.phoneNumber;
+    this.role = model.role ?? 'client';
 
-    // ✅ Формируем полный путь к аватару
-    this.avatarUrl = model.avatarUrl
-      ? `${baseUrl}${model.avatarUrl}`
-      : null;
+    this.avatarUrl = model.avatarUrl ? `${baseUrl}${model.avatarUrl}` : null;
 
-    // Объявления
     if (model.ads) {
-      this.ads = model.ads.map(ad => ({
+      this.ads = model.ads.map((ad) => ({
         id: ad.ad_id,
         name: ad.name,
         typeOfTrening: ad.typeOfTrening,
@@ -41,9 +39,7 @@ class UserDto {
         date: ad.date,
         moderation: ad.moderation,
         city_ad: ad.city_ad,
-        photo: ad.namePhoto
-          ? `${baseUrl}/uploads/${ad.namePhoto}`
-          : null,
+        photo: ad.namePhoto ? `${baseUrl}/uploads/${ad.namePhoto}` : null,
       }));
     } else {
       this.ads = [];
@@ -62,6 +58,7 @@ class UserDto {
       avatarUrl: this.avatarUrl,
       phoneNumber: this.phoneNumber,
       ads: this.ads,
+      role: this.role,
     };
   }
 
@@ -69,14 +66,17 @@ class UserDto {
     return {
       id: this.id,
       login: this.login,
+      role: this.role,
     };
   }
+
 
   toProfile() {
     return {
       id: this.id,
       login: this.login,
       ads: this.ads,
+      role: this.role,
     };
   }
 }

@@ -27,6 +27,7 @@ const UpSideBar = () => {
             <>
               <span className="link">
                 <Link to="/profile" className="link">Привет, {getUserInfo()}!</Link> {/* Ссылка на профиль */}
+                <Link to="/user/responses" className="link">Отклики</Link>
               </span>
               <button className="button" onClick={handleLogout}>
                 Выйти

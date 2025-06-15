@@ -1,9 +1,10 @@
 // src/components/AdDetail.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Skeleton from '@mui/material/Skeleton';
 import RespondModal from '../../components/UI/RespondModal';
 import UpSideBar from '../../components/UI/UpSideBar';
+import { signUpAd, getAdService } from '../../services';
 import './style.scss';
 
 const AdDetail = () => {
@@ -13,21 +14,20 @@ const AdDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    async function fetchAd() {
+    // автоматически вызываем асинхронную функцию при изменении id
+    (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:4000/ads/${id}`);
-        if (!res.ok) throw new Error('Ошибка при загрузке объявления');
-        const json = await res.json();
-        const data = json.ad || json;
+        const res = await getAdService(id);
+        console.log(res);
+        const data = res.data.ad || res.data;
         setAd(data);
       } catch (e) {
-        console.error(e);
+        console.error('Ошибка при загрузке объявления', e);
       } finally {
         setLoading(false);
       }
-    }
-    fetchAd();
+    })();
   }, [id]);
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -35,23 +35,21 @@ const AdDetail = () => {
 
   const handleRespond = async ({ date, message }) => {
     try {
-      const res = await fetch(`http://localhost:4000/ads/${id}/respond`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ date, message }),
-      });
-      if (res.status === 401) {
+      await signUpAd(id, { date, message })
+      alert("Спасибо, ваш отклик отправлен!");
+      handleCloseModal();
+    }
+    catch (error) {
+      const status = error.response?.status;
+      if (status === 401) {
         alert('Пожалуйста, зарегистрируйтесь, чтобы откликнуться');
         handleCloseModal();
-        return;
+      } else if (status === 403) {
+        alert('У вас нет прав на эту операцию');
+      } else {
+        console.error('Ошибка при отправке отклика', error);
+        alert('Ошибка при отправке отклика');
       }
-      if (!res.ok) throw new Error('Ошибка при отправке отклика');
-      alert('Спасибо, ваш отклик отправлен');
-      handleCloseModal();
-    } catch (e) {
-      console.error(e);
-      alert(e.message);
     }
   };
 

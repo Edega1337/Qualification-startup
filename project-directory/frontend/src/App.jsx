@@ -6,6 +6,7 @@ import Content from "../src/pages/Content";
 import ProfilePage from "../src/pages/Profile/ProfilePage";
 import AdDetail from "./pages/AdPage";
 import SignUp from "./pages/Registration/SignUp";
+import MyResponses from "./pages/ResponsesUser";
 import theme from "./theme";
 import "./App.css";
 
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/registration" element={<SignUp />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/ads/:id" element={<AdDetail />} />
+        <Route path="/user/responses" element={<MyResponses />} />
       </Routes>
     </ThemeProvider>
   );

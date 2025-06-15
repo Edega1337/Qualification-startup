@@ -1,4 +1,4 @@
-const { Users, adUsers } = require("../models/sequalize");
+const { Users, adUsers, Response } = require("../models/sequalize");
 const {
   removeToken,
   validateRefreshToken,
@@ -139,4 +139,25 @@ const deleteAdService = async (userId, adId) => {
 
 };
 
-module.exports = { activate, logoutUser, refreshFunc, getUserInfo, updateUserProfile, deleteAdService };
+const getResponsesForOwner = async (userId) => {
+  // Находим все отклики, относящиеся к объявлениям этого юзера
+  return Response.findAll({
+    include: [
+      {
+        model: adUsers,
+        as: 'ad',
+        where: { userId },
+        attributes: ['ad_id', 'name', 'typeOfTrening']
+      },
+      {
+        model: Users,
+        as: 'user',         // кто откликнулся
+        attributes: ['id', 'login', 'avatarUrl']
+      }
+    ],
+    order: [['createdAt', 'DESC']]
+  });
+}
+
+
+module.exports = { activate, logoutUser, refreshFunc, getUserInfo, updateUserProfile, deleteAdService, getResponsesForOwner };
