@@ -3,9 +3,18 @@ const path = require("path");
 const { TokenSchema } = require("../models/sequalize");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
+/**
+ * @param {object} payload — минимум { id, login, role }
+ * @returns {{ accessToken: string, refreshToken: string }}
+ */
+
 const tokenService = async (payload) => {
-  const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: "15m" });
-  const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: "20m" });
+  const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: "15m",
+  });
+  const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: "20m",
+  });
   return {
     accessToken,
     refreshToken,
@@ -13,49 +22,36 @@ const tokenService = async (payload) => {
 };
 
 const saveToken = async (userId, refreshToken) => {
-  const tokenData = await TokenSchema.findOne({ userId: userId });
+  const tokenData = await TokenSchema.findOne({ userId });
   if (tokenData) {
-    TokenSchema.refreshToken = refreshToken;
+    tokenData.refreshToken = refreshToken;
     return tokenData.save();
   }
-  const token = await TokenSchema.create({ userId: userId, refreshToken });
-  return token;
+  return TokenSchema.create({ userId, refreshToken });
 };
 
 const removeToken = async (refreshToken) => {
-  const tokenData = await TokenSchema.destroy({
-    where: {
-      refreshToken,
-    },
-  });
-
-  if (tokenData === 1) return refreshToken;
+  const tokenData = await TokenSchema.destroy({ where: { refreshToken } });
+  return tokenData === 1 ? refreshToken : null;
 };
 
 const validateAccessToken = (token) => {
   try {
-    const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-
-    return userData;
-  } catch (error) {
+    return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+  } catch {
     return null;
   }
 };
 
-const validateRefreshToken = async (token) => {
+const validateRefreshToken = (token) => {
   try {
-    const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-
-    return userData;
-  } catch (error) {
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  } catch {
     return null;
   }
 };
 
-const findToken = async (refreshToken) => {
-  const tokenData = await TokenSchema.findOne({ refreshToken });
-  return tokenData;
-};
+const findToken = (refreshToken) => TokenSchema.findOne({ refreshToken });
 
 module.exports = {
   tokenService,

@@ -72,6 +72,12 @@ fastify.register(
     instance.route(router().postResponse);
     instance.route(router().listResponses);
     instance.route(router().userResponses);
+    instance.route(router().submitRole);
+    instance.route(router().listRoles);
+    instance.route(router().updateRoles);
+    instance.route(router().myResponses);
+    instance.route(router().acceptResponse);
+    instance.route(router().rejectResponse);
     done();
   },
   { prefix: "/" }

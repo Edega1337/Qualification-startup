@@ -2,12 +2,21 @@ const { Sequelize, DataTypes } = require("sequelize");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
-// Создаём подключение к базе данных
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
-// Модель пользователя
+const RoleRequest = sequelize.define(
+  "RoleRequest",
+  {
+    request_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false },
+    status: { type: DataTypes.ENUM('pending', 'approved', 'rejected'), defaultValue: 'pending' },
+    moderatorComment: { type: DataTypes.STRING, allowNull: true },
+  }, {
+  tableName: 'RoleRequests', timestamps: true, updatedAt: 'updatedAt', createdAt: 'createdAt',
+});
+
 const Users = sequelize.define(
   "Users",
   {
@@ -22,6 +31,11 @@ const Users = sequelize.define(
     phoneNumber: { type: DataTypes.STRING, allowNull: true },
     bio: { type: DataTypes.TEXT, allowNull: true },
     avatarUrl: { type: DataTypes.STRING, allowNull: true },
+    role: {
+      type: DataTypes.ENUM('client', 'coach'),
+      allowNull: false,
+      defaultValue: 'client',
+    },
   },
   {
     timestamps: true,
@@ -30,7 +44,6 @@ const Users = sequelize.define(
   }
 );
 
-// Модель токенов
 const TokenSchema = sequelize.define(
   "TokenSchema",
   {
@@ -41,7 +54,6 @@ const TokenSchema = sequelize.define(
   { timestamps: true }
 );
 
-// Модель объявлений
 const adUsers = sequelize.define(
   "adUsers",
   {
@@ -59,7 +71,6 @@ const adUsers = sequelize.define(
   { timestamps: true }
 );
 
-// Модель откликов
 const Response = sequelize.define(
   "Response",
   {
@@ -73,7 +84,6 @@ const Response = sequelize.define(
   { timestamps: true }
 );
 
-// Ассоциации
 Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads', onDelete: 'CASCADE' });
 adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
@@ -83,7 +93,9 @@ Response.belongsTo(adUsers, { foreignKey: 'adId', as: 'ad' });
 Users.hasMany(Response, { foreignKey: 'userId', as: 'responsesByUser', onDelete: 'CASCADE' });
 Response.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
-// Синхронизация и проверка соединения
+
+RoleRequest.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
+
 (async () => {
   try {
     const forceBD = false;
@@ -91,6 +103,7 @@ Response.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
     await TokenSchema.sync({ force: forceBD });
     await adUsers.sync({ force: forceBD });
     await Response.sync({ force: forceBD });
+    await RoleRequest.sync({ force: forceBD });
     await sequelize.authenticate();
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {
@@ -104,5 +117,12 @@ module.exports = {
   Users,
   TokenSchema,
   adUsers,
-  Response
+  Response,
+  RoleRequest
 };
+
+
+
+
+
+

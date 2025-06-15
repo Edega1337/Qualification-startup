@@ -44,30 +44,29 @@ const getUser = async (body) => {
 
 const createUser = async (body) => {
   try {
-    const { email, login, password, name, city, phoneNumber, bio } = body;
-    console.log("Начало поиска");
-    console.log("Что мы получили от пользователя:", body);
+    const {
+      email,
+      login,
+      password,
+      name,
+      city,
+      phoneNumber,
+      bio,
+      role = 'client',
+    } = body;
 
     const existingUser = await Users.findOne({
-      where: {
-        [Op.or]: [
-          { email: email },
-          { login: login }
-        ]
-      }
+      where: { [Op.or]: [{ email }, { login }] },
     });
-
     if (existingUser) {
       const conflictField = existingUser.email === email ? 'email' : 'login';
       const error = new Error(`Пользователь с таким ${conflictField} уже существует`);
       error.statusCode = 409;
-      throw error; // ✅ Бросаем ошибку, а не возвращаем
+      throw error;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const activationLink = uuidv4();
-
-    console.log("Ссылка для пользователя", activationLink);
 
     const newUser = await Users.create({
       email,
@@ -77,25 +76,20 @@ const createUser = async (body) => {
       name,
       city,
       phoneNumber,
-      bio
+      bio,
+      role,
     });
 
     await mailService(email, `${process.env.API_URL}/activate/${activationLink}`);
 
     const userDto = new UserDto(newUser);
     const tokens = await tokenService(userDto.toPayload());
-    await saveToken(userDto.toJSON().id, tokens.refreshToken);
+    await saveToken(userDto.id, tokens.refreshToken);
 
-    return {
-      status: 201,
-      data: {
-        ...tokens
-      }
-    };
-
+    return { status: 201, data: { ...tokens } };
   } catch (err) {
     console.error("Ошибка при создании пользователя:", err);
-    throw err; // ✅ Бросаем дальше, чтобы контроллер поймал в catch
+    throw err;
   }
 };
 
