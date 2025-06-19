@@ -10,6 +10,8 @@ const { getAdDetail, respondToAd, listResponses } = require("../services/ad-serv
 const ResponseService = require("../services/response-service.js");
 const ModerationService = require('../services/moderation-service');
 const AdService = require("../services/upload-service");
+const { getTraffic } = require("../services/analytics-service.js");
+const { getRetention } = require("../services/retention-service.js");
 
 
 const handleErrorResponse = (res, error) => {
@@ -357,6 +359,33 @@ const rejectResponseHandler = async (req, res) => {
   }
 }
 
+/**
+ * Аналитика посещения пользователями
+ */
+const trafficController = async (req, res) => {
+  try {
+    const { period } = req.query;
+    if (!period) {
+      return res.status(400).send({ error: "period обязателен" });
+    }
+
+    const data = await getTraffic(period);
+    return res.send(data);
+  } catch (err) {
+    handleErrorResponse(res, err);
+  }
+}
+
+const retentionController = async (req, res) => {
+  try {
+    const days = parseInt(req.query.days, 10);
+    const data = await getRetention(days);
+    console.log('Retention days=', days, '→', data);
+    res.send(data);
+  } catch (err) {
+    handleErrorResponse(res, err);
+  }
+}
 
 
 module.exports = {
@@ -380,6 +409,8 @@ module.exports = {
   updateRoleRequest,
   getMyResponsesHandler,
   acceptResponseHandler,
-  rejectResponseHandler
+  rejectResponseHandler,
+  trafficController,
+  retentionController
 };
 

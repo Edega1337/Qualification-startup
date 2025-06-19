@@ -22,7 +22,9 @@ const {
   updateRoleRequest,
   getMyResponsesHandler,
   acceptResponseHandler,
-  rejectResponseHandler
+  rejectResponseHandler,
+  trafficController,
+  retentionController
 } = require("../controllers/controllers");
 const { listResponses } = require("../services/ad-service");
 
@@ -160,6 +162,32 @@ function router() {
       method: 'PATCH',
       url: 'responses/:id/reject',
       handler: rejectResponseHandler,
+    },
+    analyticsRoutes: {
+      method: 'GET',
+      url: 'analytics/traffic',
+      schema: {
+        querystring: {
+          type: "object",
+          properties: {
+            period: { type: "string", description: "e.g. 30d или 6m" },
+          },
+          required: ["period"],
+        },
+      },
+      handler: trafficController
+    },
+    analyticsRetention: {
+      method: 'GET',
+      url: 'analytics/retention',
+      schema: {
+        querystring: {
+          type: 'object',
+          properties: { days: { type: 'integer', minimum: 1 } },
+          required: ['days'],
+        },
+      },
+      handler: retentionController,
     },
   };
 }

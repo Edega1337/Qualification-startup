@@ -54,6 +54,8 @@ fastify.register(
     instance.route(router().activate);
     instance.route(router().searchAds);
     instance.route(router().getAd);
+    instance.route(router().analyticsRoutes);
+    instance.route(router().analyticsRetention)
     done();
   },
   { prefix: "/" }
@@ -82,6 +84,26 @@ fastify.register(
   },
   { prefix: "/" }
 );
+
+fastify.addHook("onRequest", async (req, reply) => {
+  try {
+    const { method, url, headers } = req.raw;
+    if (
+      method === "GET" &&
+      (url.startsWith("/ads/search") || /^\/ads\/\d+/.test(url))
+    ) {
+      const token = headers.authorization?.split(" ")[1];
+      if (token) {
+        const payload = verifyJwt(token);
+        if (payload?.id) {
+          await Visit.create({ userId: payload.id });
+        }
+      }
+    }
+  } catch (err) {
+    req.log.warn("Ошибка логирования визита: " + err.message);
+  }
+});
 
 fastify.listen({ port: 4000, host: "0.0.0.0" }, (err) => {
   if (err) {

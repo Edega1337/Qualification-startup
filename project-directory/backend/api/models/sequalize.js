@@ -9,13 +9,25 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 const RoleRequest = sequelize.define(
   "RoleRequest",
   {
-    request_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    request_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     userId: { type: DataTypes.INTEGER, allowNull: false },
-    status: { type: DataTypes.ENUM('pending', 'approved', 'rejected'), defaultValue: 'pending' },
+    status: {
+      type: DataTypes.ENUM("pending", "approved", "rejected"),
+      defaultValue: "pending",
+    },
     moderatorComment: { type: DataTypes.STRING, allowNull: true },
-  }, {
-  tableName: 'RoleRequests', timestamps: true, updatedAt: 'updatedAt', createdAt: 'createdAt',
-});
+  },
+  {
+    tableName: "RoleRequests",
+    timestamps: true,
+    updatedAt: "updatedAt",
+    createdAt: "createdAt",
+  }
+);
 
 const Users = sequelize.define(
   "Users",
@@ -32,9 +44,9 @@ const Users = sequelize.define(
     bio: { type: DataTypes.TEXT, allowNull: true },
     avatarUrl: { type: DataTypes.STRING, allowNull: true },
     role: {
-      type: DataTypes.ENUM('client', 'coach'),
+      type: DataTypes.ENUM("client", "coach"),
       allowNull: false,
-      defaultValue: 'client',
+      defaultValue: "client",
     },
   },
   {
@@ -49,7 +61,11 @@ const TokenSchema = sequelize.define(
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     refreshToken: { type: DataTypes.STRING, allowNull: false },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Users, key: "id" } },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: Users, key: "id" },
+    },
   },
   { timestamps: true }
 );
@@ -66,7 +82,11 @@ const adUsers = sequelize.define(
     date: { type: DataTypes.DATE, allowNull: false },
     city_ad: { type: DataTypes.STRING, allowNull: false },
     moderation: { type: DataTypes.BOOLEAN, defaultValue: false },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Users, key: "id" } },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: Users, key: "id" },
+    },
   },
   { timestamps: true }
 );
@@ -74,27 +94,80 @@ const adUsers = sequelize.define(
 const Response = sequelize.define(
   "Response",
   {
-    response_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    adId: { type: DataTypes.INTEGER, allowNull: false, references: { model: adUsers, key: 'ad_id' } },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Users, key: 'id' } },
+    response_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    adId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: adUsers, key: "ad_id" },
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: { model: Users, key: "id" },
+    },
     date: { type: DataTypes.DATE, allowNull: false },
     message: { type: DataTypes.TEXT, allowNull: true },
-    status: { type: DataTypes.ENUM('new', 'viewed', 'accepted', 'rejected'), defaultValue: 'new' },
+    status: {
+      type: DataTypes.ENUM("new", "viewed", "accepted", "rejected"),
+      defaultValue: "new",
+    },
   },
   { timestamps: true }
 );
 
-Users.hasMany(adUsers, { foreignKey: 'userId', as: 'ads', onDelete: 'CASCADE' });
-adUsers.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
+const Visit = sequelize.define(
+  "Visit",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    visitedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: "visited_at",
+    },
+  },
+  {
+    tableName: "Visits",
+    timestamps: false,
+  }
+);
 
-adUsers.hasMany(Response, { foreignKey: 'adId', as: 'responses', onDelete: 'CASCADE' });
-Response.belongsTo(adUsers, { foreignKey: 'adId', as: 'ad' });
+Visit.belongsTo(Users, { foreignKey: "userId", as: "user" });
 
-Users.hasMany(Response, { foreignKey: 'userId', as: 'responsesByUser', onDelete: 'CASCADE' });
-Response.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
+Users.hasMany(adUsers, {
+  foreignKey: "userId",
+  as: "ads",
+  onDelete: "CASCADE",
+});
+adUsers.belongsTo(Users, { foreignKey: "userId", as: "user" });
 
+adUsers.hasMany(Response, {
+  foreignKey: "adId",
+  as: "responses",
+  onDelete: "CASCADE",
+});
+Response.belongsTo(adUsers, { foreignKey: "adId", as: "ad" });
 
-RoleRequest.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
+Users.hasMany(Response, {
+  foreignKey: "userId",
+  as: "responsesByUser",
+  onDelete: "CASCADE",
+});
+Response.belongsTo(Users, { foreignKey: "userId", as: "user" });
+
+RoleRequest.belongsTo(Users, { foreignKey: "userId", as: "user" });
 
 (async () => {
   try {
@@ -104,6 +177,7 @@ RoleRequest.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
     await adUsers.sync({ force: forceBD });
     await Response.sync({ force: forceBD });
     await RoleRequest.sync({ force: forceBD });
+    await Visit.sync({ force: forceBD });
     await sequelize.authenticate();
     console.log("Соединение с БД было успешно установлено");
   } catch (e) {
@@ -118,11 +192,6 @@ module.exports = {
   TokenSchema,
   adUsers,
   Response,
-  RoleRequest
+  RoleRequest,
+  Visit
 };
-
-
-
-
-
-

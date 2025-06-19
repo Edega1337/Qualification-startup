@@ -7,7 +7,10 @@ import ProfilePage from "../src/pages/Profile/ProfilePage";
 import AdDetail from "./pages/AdPage";
 import SignUp from "./pages/Registration/SignUp";
 import MyResponses from "./pages/ResponsesUser";
+import ModerationPanel from "./pages/ModerationPanel";
+import AnalyticsPanel from "./pages/AnalyticsPanel";
 import theme from "./theme";
+
 import "./App.css";
 
 const App = () => {
@@ -21,6 +24,8 @@ const App = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/ads/:id" element={<AdDetail />} />
         <Route path="/user/responses" element={<MyResponses />} />
+        <Route path="/moderation" element={<ModerationPanel />} />
+        <Route path="/analytics" element={<AnalyticsPanel />} />
       </Routes>
     </ThemeProvider>
   );
