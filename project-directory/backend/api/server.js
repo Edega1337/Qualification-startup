@@ -55,7 +55,6 @@ fastify.register(
     instance.route(router().searchAds);
     instance.route(router().getAd);
     instance.route(router().analyticsRoutes);
-    instance.route(router().analyticsRetention)
     done();
   },
   { prefix: "/" }

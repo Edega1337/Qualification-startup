@@ -1,4 +1,3 @@
-// src/pages/AnalyticsPanel.jsx
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTraffic } from '../../hooks/useTraffic';
@@ -8,7 +7,7 @@ import {
   BarChart, Bar, LabelList, Label
 } from 'recharts';
 
-// Форматируем даты и убираем время
+
 const formatDate = (isoString, periodType) => {
   const date = new Date(isoString);
   if (periodType === 'day') {
@@ -17,7 +16,7 @@ const formatDate = (isoString, periodType) => {
   return date.toLocaleDateString('ru-RU', { month: 'short', year: 'numeric' });
 };
 
-// Кастомный тултип для графиков
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
@@ -26,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           {formatDate(label, 'day')}
         </p>
         <p className="font-semibold text-gray-800">
-          Зарегистрированных: {payload[0].value}
+          {payload[0].name}: {payload[0].value}{payload[0].unit || ''}
         </p>
       </div>
     );
@@ -97,7 +96,7 @@ const AnalyticsPanel = () => {
       {/* DAU график */}
       <section className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4 text-gray-700">
-          График ежедневно зарегистрированных пользователей, за последние 30 дней
+          Ежедневные зарегистрированные пользователи, за последние 30 дней
         </h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={dauData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -128,7 +127,7 @@ const AnalyticsPanel = () => {
       {/* MAU график */}
       <section className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4 text-gray-700">
-          График ежемесячно зарегистрированных пользователей, за последние 6 месяцев
+          Ежемесячные зарегистрированные пользователи, за последние 6 месяцев
         </h2>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart
@@ -157,14 +156,16 @@ const AnalyticsPanel = () => {
       {/* Retention график */}
       <section className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-4 text-gray-700">
-          Retention-аналитика
+          Retention-аналитика ({retentionDays}-дневный)
         </h2>
         <div className="mb-4 flex space-x-4">
           {[1, 7, 30].map(day => (
             <button
               key={day}
               onClick={() => setRetentionDays(day)}
-              className={`px-4 py-2 rounded ${retentionDays === day ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`px-4 py-2 rounded ${retentionDays === day
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700'}`}
             >
               {day}-дневный
             </button>
@@ -178,9 +179,23 @@ const AnalyticsPanel = () => {
             barGap={4}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="cohort" tickFormatter={label => formatDate(label, 'day')} stroke="#4B5563" />
-            <YAxis stroke="#4B5563" unit="%" />
-            <Tooltip content={<CustomTooltip />} />
+            <XAxis
+              dataKey="cohort"
+              tickFormatter={label => formatDate(label, 'day')}
+              stroke="#4B5563"
+            />
+            <YAxis
+              stroke="#4B5563"
+              tickFormatter={val => `${val}%`}
+            >
+              <Label angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }}>
+                Процент возврата
+              </Label>
+            </YAxis>
+            <Tooltip
+              formatter={val => `${val}%`}
+              labelFormatter={label => formatDate(label, 'day')}
+            />
             <Legend verticalAlign="top" height={36} />
             <Bar dataKey="retention" name="Retention %" fill="#F59E0B" radius={[4, 4, 0, 0]}>
               <LabelList dataKey="retention" position="top" formatter={val => `${val}%`} />

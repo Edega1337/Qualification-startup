@@ -1,20 +1,40 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import UpSideBar from '../../components/UI/UpSideBar';
 import { Link as RouterLink } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
-import './style.scss';
 import {
   getMyResponses,       // для клиента
   acceptResponse,
   rejectResponse,
 } from '../../services/index';
 
+// Функция для динамической загрузки Tailwind CSS через CDN
+function loadTailwindScript() {
+  return new Promise(resolve => {
+    if (document.getElementById('tailwindcss-script')) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.id = 'tailwindcss-script';
+    script.src = 'https://cdn.tailwindcss.com';
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+}
+
 const MyResponses = () => {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processingIds, setProcessingIds] = useState([]);
+  const [stylesLoaded, setStylesLoaded] = useState(false);
   const accessToken = useStore(state => state.accessToken);
   const role = useStore(state => state.user?.role);
+
+  // Подгружаем Tailwind CSS дополнительно через CDN
+  useEffect(() => {
+    loadTailwindScript().then(() => setStylesLoaded(true));
+  }, []);
 
   const fetchResponses = useCallback(() => {
     if (!accessToken) return;
@@ -27,8 +47,8 @@ const MyResponses = () => {
   }, [accessToken, role]);
 
   useEffect(() => {
-    fetchResponses();
-  }, [fetchResponses]);
+    if (stylesLoaded) fetchResponses();
+  }, [fetchResponses, stylesLoaded]);
 
   const handleAction = async (responseId, action) => {
     setProcessingIds(ids => [...ids, responseId]);
@@ -43,67 +63,116 @@ const MyResponses = () => {
     }
   };
 
-  if (loading) return (
-    <div className="container responses-user"><UpSideBar /><p>Загрузка откликов…</p></div>
-  );
+  // Пока Tailwind не загрузился – показываем заглушку
+  if (!stylesLoaded) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <UpSideBar />
+        <div className="flex-grow flex items-center justify-center">
+          <p className="text-gray-500 text-lg">Загрузка стилей...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (!list.length) return (
-    <div className="container responses-user"><UpSideBar /><p>У вас ещё нет откликов{role === 'coach' ? ' на ваши объявления' : ''}</p></div>
-  );
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <UpSideBar />
+        <div className="flex-grow flex items-center justify-center">
+          <p className="text-gray-500 text-lg">Загрузка откликов…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!list.length) {
+    return (
+      <div className="flex min-h-screen bg-gray-50">
+        <UpSideBar />
+        <div className="flex-grow flex items-center justify-center">
+          <p className="text-gray-500 text-lg">У вас ещё нет откликов{role === 'coach' ? ' на ваши объявления' : ''}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container responses-user">
+    <div className="flex min-h-screen bg-gray-50">
       <UpSideBar />
-      <h1 className="responses-user__title">{role === 'coach' ? 'Отклики на мои объявления' : 'Мои отклики'}</h1>
-      <div className="responses-grid">
-        {list.map(resp =>
-        (
-          <div key={resp.response_id} className="response-card">
-            <RouterLink to={`/ads/${resp.ad.ad_id}`} className="response-card__img-link">
-              <div className="response-card__img-wrapper">
-                <img
-                  src={
-                    resp.ad
-                      ? 'http://localhost:4000/uploads/6f495276-ea0e-4d31-bca7-98a2cc7462e4.png'
-                      : 'http://localhost:4000/default-ad.png'
-                  }
-                  alt={resp.ad.name}
-                  className="response-card__img"
-                />
-              </div>
-            </RouterLink>
-            <div className="response-card__info">
-              <RouterLink to={`/ads/${resp.ad.ad_id}`} className="response-card__name">
-                {resp.ad.name}
+      <div className="flex-grow p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+          {role === 'coach' ? 'Отклики на мои объявления' : 'Мои отклики'}
+        </h1>
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map(resp => (
+            <div
+              key={resp.response_id}
+              className="bg-white rounded-2xl shadow p-6 flex flex-col"
+            >
+              <RouterLink to={`/ads/${resp.ad.ad_id}`} className="block mb-4">
+                <div className="h-40 w-full overflow-hidden rounded-xl">
+                  <img
+                    src={
+                      `http://localhost:4000/uploads/d2e0d7cc-923a-45b3-8e1d-bd25950b70f0.jpg`
+                    }
+                    alt={resp.ad.name}
+                  />
+                </div>
               </RouterLink>
-              <span className="response-card__type">{resp.ad.typeOfTrening}</span>
-              <p className="response-card__message"><strong>Сообщение:</strong> {resp.message || '–'}</p>
-              <p className="response-card__meta"><strong>Дата отклика:</strong> {new Date(resp.date).toLocaleString()}</p>
-              <p className="response-card__meta"><strong>Статус:</strong> <span className={`badge badge--${resp.status}`}>{resp.status}</span></p>
-              {role === 'coach' && resp.status === 'rejected' && resp.comment && (
-                <p className="response-card__comment"><strong>Комментарий:</strong> {resp.comment}</p>
+              <div className="flex-grow">
+                <RouterLink to={`/ads/${resp.ad.ad_id}`} className="text-lg font-semibold text-gray-800 hover:text-blue-600">
+                  {resp.ad.name}
+                </RouterLink>
+                <p className="text-sm text-blue-500 mt-1">{resp.ad.typeOfTrening}</p>
+                <p className="text-gray-600 mt-3"><strong>Сообщение:</strong> {resp.message || '–'}</p>
+                <p className="text-gray-600 mt-2 text-sm"><strong>Дата отклика:</strong> {new Date(resp.date).toLocaleString()}</p>
+                <p className="mt-2">
+                  <strong>Статус:</strong>{' '}
+                  <span className={`inline-block px-2 py-1 text-xs rounded-full text-white ${resp.status === 'accepted' ? 'bg-green-500' : resp.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
+                    }`}>{resp.status}</span>
+                </p>
+                {role === 'coach' && resp.status === 'rejected' && resp.comment && (
+                  <p className="text-gray-600 mt-2"><strong>Комментарий:</strong> {resp.comment}</p>
+                )}
+              </div>
+              {/* Добавленные кнопки-заглушки */}
+              <div className="mt-4 flex space-x-2">
+                <button
+                  className="flex-1 py-2 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-600 disabled:opacity-50"
+                  disabled={processingIds.includes(resp.response_id)}
+                >
+                  Принять
+                </button>
+                <button
+                  className="flex-1 py-2 rounded-xl bg-purple-500 text-white font-medium hover:bg-purple-600 disabled:opacity-50"
+                  disabled={processingIds.includes(resp.response_id)}
+                >
+                  Отклонить
+                </button>
+              </div>
+
+              {role === 'coach' && (
+                <div className="mt-4 flex space-x-2">
+                  <button
+                    className="flex-1 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 disabled:opacity-50"
+                    onClick={() => handleAction(resp.response_id, 'accept')}
+                    disabled={processingIds.includes(resp.response_id) || resp.status !== 'pending'}
+                  >
+                    {processingIds.includes(resp.response_id) ? '…' : 'Принять'}
+                  </button>
+                  <button
+                    className="flex-1 py-2 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 disabled:opacity-50"
+                    onClick={() => handleAction(resp.response_id, 'reject')}
+                    disabled={processingIds.includes(resp.response_id) || resp.status !== 'pending'}
+                  >
+                    {processingIds.includes(resp.response_id) ? '…' : 'Отклонить'}
+                  </button>
+                </div>
               )}
             </div>
-            {role === 'coach' && (
-              <div className="response-card__actions">
-                <button
-                  className="btn btn--accept"
-                  onClick={() => handleAction(resp.response_id, 'accept')}
-                  disabled={processingIds.includes(resp.response_id) || resp.status !== 'pending'}
-                >
-                  {processingIds.includes(resp.response_id) ? '…' : 'Принять'}
-                </button>
-                <button
-                  className="btn btn--reject"
-                  onClick={() => handleAction(resp.response_id, 'reject')}
-                  disabled={processingIds.includes(resp.response_id) || resp.status !== 'pending'}
-                >
-                  {processingIds.includes(resp.response_id) ? '…' : 'Отклонить'}
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

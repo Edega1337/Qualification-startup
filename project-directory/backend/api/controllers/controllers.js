@@ -10,8 +10,8 @@ const { getAdDetail, respondToAd, listResponses } = require("../services/ad-serv
 const ResponseService = require("../services/response-service.js");
 const ModerationService = require('../services/moderation-service');
 const AdService = require("../services/upload-service");
-const { getTraffic } = require("../services/analytics-service.js");
-const { getRetention } = require("../services/retention-service.js");
+const { getTraffic, getRetention } = require("../services/analytics-service.js");
+
 
 
 const handleErrorResponse = (res, error) => {

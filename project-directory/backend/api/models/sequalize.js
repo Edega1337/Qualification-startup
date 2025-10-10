@@ -144,6 +144,8 @@ const Visit = sequelize.define(
   }
 );
 
+
+
 Visit.belongsTo(Users, { foreignKey: "userId", as: "user" });
 
 Users.hasMany(adUsers, {
@@ -193,5 +195,5 @@ module.exports = {
   adUsers,
   Response,
   RoleRequest,
-  Visit
+  Visit,
 };
